@@ -1,0 +1,3 @@
+#ZONE   INTERFACE       BROADCAST       OPTIONS
+net     docker0         detect          bridge,tcpflags,logmartians,nosmurfs
+
