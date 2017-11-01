@@ -56,4 +56,4 @@ Using the Webmin UI visit https://ip_or_hostname:9000
                             *Private key file                `/etc/webmin/letsencrypt-key.pem`
                             *Certificate authorities file    `/etc/webmin/letsencrypt-ca.pem`"
                             
-### Your now ready to config FreePBX by by visiting your https://hosts_ip or https://hostname address.
+### Your now ready to config FreePBX by by visiting your https://hosts_ip or https://hostname address. 
