@@ -49,7 +49,7 @@ Using the Webmin UI visit https://ip_or_hostname:9000
                     "Webmin -> Webmin Configuration -> SSL Encryption -> Let's Encrypt -> 
                                                Website root directory for validation file -> Other directory `/var/www/html`"
 * Add Let's Encrypt SSL certicate to Apache default:
-                    "Servers -> Apache Webserver -> select 443 virtual hoost -> uncheck -> SSLv2 SSLv3 TLSv1
+                    "Servers -> Apache Webserver -> select 443 virtual host -> uncheck -> SSLv2 SSLv3 TLSv1
                             -> SSL Options 
                             *Certificate/private key file    `/etc/webmin/letsencrypt-cert.pem`
                             *Private key file                `/etc/webmin/letsencrypt-key.pem`
