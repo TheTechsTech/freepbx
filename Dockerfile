@@ -87,7 +87,6 @@ RUN echo " " > /etc/yum.repos.d/webmin.repo \
    && sed -i '1 i\[Webmin]\nname=Webmin Distribution Neutral\n#baseurl=http://download.webmin.com/download/yum\nmirrorlist=http://download.webmin.com/download/yum/mirrorlist\nenabled=1' /etc/yum.repos.d/webmin.repo \
    && wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
    && yum install webmin -y && rm jcameron-key.asc
-RUN yum install http://prdownloads.sourceforge.net/sourceforge/webadmin/webmin-1.860-1.noarch.rpm -y 
 
 RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
     && sed -i "s#10000#9000#" /etc/webmin/miniserv.conf \
