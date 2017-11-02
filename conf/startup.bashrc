@@ -3,7 +3,7 @@ export WEBMINPORT
 
 systemctl enable denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service
 
-if expr "$SSHPORT" : '^[0-9]+$' >/dev/null
+if [[ $SSHPORT =~ ^[0-9]+$ ]]
 then 
     sed -i "s#Port 2122#Port $SSHPORT#" /etc/ssh/sshd_config
     systemctl enable sshd.service
@@ -62,7 +62,7 @@ if [ "$SSHPORT" == "off" ] && pgrep -x "sshd" >/dev/null
 then
     systemctl disable sshd.service
     service sshd stop
-elif expr "$SSHPORT" : '^[0-9]+$' >/dev/null 
+elif [[ $SSHPORT =~ ^[0-9]+$ ]] 
 then
     if ! pgrep -x "sshd"  > /dev/null
     then
@@ -70,7 +70,7 @@ then
     fi
 fi
 
-if expr "$WEBMINPORT" : '^[0-9]+$' >/dev/null 
+if [[ $WEBMINPORT =~ ^[0-9]+$ ]]
 then  
     sed -i "s#9000#$WEBMINPORT#" /etc/webmin/miniserv.conf
     if ! pgrep -x "miniserv.pl" > /dev/null
@@ -78,4 +78,3 @@ then
         systemctl start webmin 
     fi
 fi
- 
