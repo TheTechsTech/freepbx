@@ -30,9 +30,9 @@ RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash - && sudo yum install -
 # Asterisk and FreePBX Repositorie
 RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n[pbx]\nname=pbx\n#mirrorlist=http://mirrorlist.freepbxdistro.org/?pbxver=10.13.66&release=14.4&arch=$basearch&repo=pbx\nbaseurl=http://yum.freepbxdistro.org/pbx/10.13.66/$basearch/\ngpgcheck=0\nenabled=1' /etc/yum.repos.d/FreePBX.repo 
 
-# Install jansson iksemel and pjproject 
+# Install lame jansson iksemel and pjproject 
 RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm \
-    && yum --enablerepo=forensics install jansson iksemel pjproject -y
+    && yum --enablerepo=forensics install lame jansson iksemel pjproject -y
 
 # Install Asterisk, Add Asterisk user, Download extra sounds
 RUN yum install ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.1/x86_64/os/Packages/libical-0.48-6.el7.x86_64.rpm -y 
