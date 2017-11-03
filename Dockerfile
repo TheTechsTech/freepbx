@@ -9,7 +9,7 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     fail2ban-hostsdeny denyhosts openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel
     
 # Install firewall
 RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
