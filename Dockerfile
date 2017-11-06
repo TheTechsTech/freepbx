@@ -11,14 +11,11 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel
     
-# Install firewall
-RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
-    && yum install -y shorewall-core-5.1.8.0-1.el7.noarch.rpm \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.0-1.el7.noarch.rpm \
-    && yum install -y shorewall-5.1.8.0-1.el7.noarch.rpm \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.0-1.el7.noarch.rpm \
-    && yum install -y shorewall-init-5.1.8.0-1.el7.noarch.rpm \
-    && yum install fail2ban-shorewall -y && rm -f shorewall-*
+# Install Shorewall firewall and fail2ban action 
+RUN yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
+    && yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.0-1.el7.noarch.rpm \
+    && yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.0-1.el7.noarch.rpm \
+    && yum install fail2ban-shorewall -y
 	
 # Install php 5.6 repositories and php5.6w	
 RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear \
@@ -94,7 +91,7 @@ RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd
     && sed -i "s#STARTUP_ENABLED=No#STARTUP_ENABLED=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
-	&& systemctl enable denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service \
+	&& systemctl enable iptables.service denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service \
     && cat /etc/startup.bashrc >> /etc/bashrc \
     && echo "root:freepbx" | chpasswd
 

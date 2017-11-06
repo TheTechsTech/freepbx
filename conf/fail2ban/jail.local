@@ -747,14 +747,16 @@ logpath = /var/log/nsd.log
 [asterisk]
 
 port     = 5060,5061
-action = shorewall[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
-        shorewall[protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
+action = iptables-allports[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
+        iptables-allports[protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
         hostsdeny[]
+        shorewall[]
 logpath = /var/log/asterisk/full
 enabled = true
 filter = asterisk
 findtime = 86400
 bantime = -1
+maxretry = 3
 
 
 [freeswitch]
@@ -807,6 +809,7 @@ enabled = true
 filter = recidive
 action = shorewall[]
         hostsdeny[]
+        iptables-allports[]
 maxretry = 2
 
 
@@ -931,7 +934,8 @@ logpath = /etc/httpd/logs/error_log
 [ssh-iptables]
 enabled  = true
 filter   = sshd
-action = shorewall[name=SSH, port=ssh, protocol=tcp]
+action = iptables-new[name=SSH, port=ssh, protocol=tcp]
+        shorewall[]
 logpath  = /var/log/secure
 maxretry = 3
 bantime = 7200
@@ -940,14 +944,16 @@ bantime = 7200
 enabled = true
 filter   = asterisk                                                                                        
 action = shorewall[name=ASTERISK, port=5060]
+        iptables-allports[name=ASTERISK, port=5061]
 logpath = /var/log/asterisk/full
-maxretry = 3
-bantime = -1
+maxretry = 2
+bantime = -1 
 
 [ast-cli-attck]                                                                                            
 enabled = true
 filter   = asterisk_cli                                                                                    
-action = shorewall[name=AST_CLI_Attack, port=5060]
+action = iptables-new[name=AST_CLI_Attack, port=5060]
+        shorewall[]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
@@ -955,7 +961,8 @@ bantime = -1
 [asterisk-manager]                                                                                         
 enabled = true
 filter   = asterisk_manager                                                                                
-action = shorewall[name=AST_MANAGER, port=5038]
+action = iptables-new[name=AST_MANAGER, port=5038]
+        shorewall[]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
@@ -963,7 +970,7 @@ bantime = -1
 [mor_ddos]                                                                                                 
 enabled = true
 filter   = mor_ddos                                                                                        
-action = shorewall[name=mor_ddos]
+action = iptables-multiport[name=mor_ddos]
+        shorewall[]
 logpath = /var/log/httpd/error_log
-maxretry = 20
 bantime = 3600

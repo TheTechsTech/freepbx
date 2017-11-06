@@ -1,7 +1,7 @@
 export SSHPORT
 export WEBMINPORT
 
-systemctl enable denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service
+systemctl enable iptables.service denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service
 
 if [[ $SSHPORT =~ ^[0-9]+$ ]]
 then 
@@ -14,6 +14,7 @@ fi
 if ! pgrep -x "denyhosts.py" > /dev/null
 then
 	rm -f /var/lock/subsys/denyhosts
+    systemctl start iptables
     systemctl start denyhosts
     systemctl start shorewall
 fi
