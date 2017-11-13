@@ -218,7 +218,7 @@ port    = ssh
 logpath = /var/log/secure
 enabled = true
 filter = sshd
-action = shorewall[]
+action = %(banaction)s[name=sshd, protocol=tcp]
 maxretry = 2
 bantime = -1
 
@@ -231,7 +231,7 @@ port    = ssh
 logpath = /var/log/secure
 enabled = true
 filter = sshd-ddos
-action = shorewall[]
+action = %(banaction)s[name=sshd-ddos, protocol=tcp]
 bantime = -1
 maxretry = 2
 
@@ -249,7 +249,7 @@ logpath = /var/log/secure
 maxretry = 3
 enabled = true
 filter = selinux-ssh
-action = shorewall[]
+action = %(banaction)s[name=selinux-ssh, protocol=tcp]
 bantime = -1
 
 
@@ -262,9 +262,9 @@ bantime = -1
 port     = http,https
 logpath = /etc/httpd/logs/error_log
         /var/log/httpd/access_log
-enabled = false
+enabled = true
 filter = apache-auth
-action = shorewall[]
+action = %(banaction)s[name=apache-auth, port="80,443", protocol=tcp]
 bantime = -1
 
 
@@ -278,7 +278,7 @@ bantime  = 172800
 maxretry = 1
 enabled = true
 filter = apache-badbots
-action = shorewall[]
+action = %(banaction)s[name=apache-badbots, port="80,443", protocol=tcp]
 
 
 [apache-noscript]
@@ -286,10 +286,10 @@ action = shorewall[]
 port     = http,https
 logpath = /etc/httpd/logs/error_log
         /var/log/httpd/access_log
-enabled = false
+enabled = true
 filter = apache-noscript
 bantime = -1
-action = shorewall[]
+action = %(banaction)s[name=apache-noscript, port="80,443", protocol=tcp]
 
 
 [apache-overflows]
@@ -300,7 +300,7 @@ logpath = /etc/httpd/logs/error_log
 maxretry = 1
 enabled = true
 filter = apache-overflows
-action = shorewall[]
+action = %(banaction)s[name=apache-overflows, port="80,443", protocol=tcp]
 bantime = -1
 
 
@@ -309,6 +309,9 @@ bantime = -1
 port     = http,https
 logpath  = %(apache_error_log)s
 maxretry = 2
+enabled = true
+filter = apache-nohome
+action = %(banaction)s[name=apache-nohome, port="80,443", protocol=tcp]
 
 
 [apache-botsearch]
@@ -320,7 +323,7 @@ maxretry = 2
 enabled = true
 filter = apache-botsearch
 bantime = -1
-action = shorewall[]
+action = %(banaction)s[name=apache-botsearch, port="80,443", protocol=tcp]
 
 
 [apache-fakegooglebot]
@@ -332,7 +335,7 @@ maxretry = 1
 ignorecommand = %(ignorecommands_dir)s/apache-fakegooglebot <ip>
 enabled = true
 filter = apache-fakegooglebot
-action = shorewall[]
+action = %(banaction)s[name=apache-fakegooglebot, port="80,443", protocol=tcp]
 bantime = -1
 
 
@@ -341,6 +344,9 @@ bantime = -1
 port     = http,https
 logpath  = %(apache_error_log)s
 maxretry = 2
+enabled = true
+filter = apache-modsecurity
+action = %(banaction)s[name=apache-modsecurity, port="80,443", protocol=tcp]
 
 [apache-shellshock]
 
@@ -350,7 +356,7 @@ logpath = /etc/httpd/logs/error_log
 maxretry = 1
 enabled = true
 filter = apache-shellshock
-action = shorewall[]
+action = %(banaction)s[name=apache-shellshock, port="80,443", protocol=tcp]
 bantime = -1
 
 [nginx-http-auth]
@@ -359,7 +365,7 @@ port    = http,https
 logpath = /var/log/nginx/access*.log
 enabled = false
 filter = nginx-http-auth
-action = shorewall[]
+action = %(banaction)s[]
 
 [nginx-botsearch]
 
@@ -368,7 +374,7 @@ logpath = /var/log/nginx/access*.log
 maxretry = 2
 enabled = false
 filter = nginx-botsearch
-action = shorewall[]
+action = %(banaction)s[]
 
 # Ban attackers that try to use PHP's URL-fopen() functionality
 # through GET/POST variables. - Experimental, with more than a year
@@ -406,7 +412,7 @@ port     = http,https
 logpath = /etc/httpd/logs/error_log
 enabled = false
 filter = roundcube-auth
-action = shorewall[]
+action = %(banaction)s[]
 
 
 [openwebmail]
@@ -471,7 +477,7 @@ logpath = /etc/httpd/logs/error_log
         /var/log/httpd/access_log
 enabled = true
 filter = webmin-auth
-action = shorewall[]
+action = %(banaction)s[name=webmin-auth-tcp, port=9000:9010, protocol=tcp]
 
 
 [froxlor-auth]
@@ -508,7 +514,7 @@ port     = ftp,ftp-data,ftps,ftps-data
 logpath = /var/log/secure
 enabled = true
 filter = proftpd
-action = shorewall[]
+action = %(banaction)s[name=proftpd, port=ftp, protocol=tcp]
 bantime = -1
 
 
@@ -565,7 +571,7 @@ port     = smtp,465,submission
 logpath = /var/log/maillog
 enabled = true
 filter = postfix
-action = shorewall[]
+action = %(banaction)s[name=postfix, protocol=tcp]
 maxretry = 2
 bantime = -1
 
@@ -577,7 +583,7 @@ logpath = /var/log/maillog
 maxretry = 1
 enabled = true
 filter = postfix-rbl
-action = shorewall[]
+action = %(banaction)s[name=postfix-rbl, protocol=tcp]
 
 
 [sendmail-auth]
@@ -586,7 +592,7 @@ port    = submission,465,smtp
 logpath = /var/log/maillog
 enabled = true
 filter = sendmail-auth
-action = shorewall[]
+action = %(banaction)s[name=sendmail-auth, protocol=tcp]
 
 
 [sendmail-reject]
@@ -595,7 +601,7 @@ port     = smtp,465,submission
 logpath = /var/log/maillog
 enabled = true
 filter = sendmail-reject
-action = shorewall[]
+action = %(banaction)s[name=sendmail-reject, protocol=tcp]
 
 
 [qmail-rbl]
@@ -613,7 +619,7 @@ port    = pop3,pop3s,imap,imaps,submission,465,sieve
 logpath = /var/log/maillog
 enabled = true
 filter = dovecot
-action = shorewall[]
+action = %(banaction)s[name=dovecot, port=imap, protocol=tcp]
 maxretry = 2
 bantime = -1
 
@@ -668,7 +674,7 @@ port     = smtp,465,submission,imap3,imaps,pop3,pop3s
 logpath = /var/log/maillog
 enabled = true
 filter = postfix-sasl
-action = shorewall[]
+action = %(banaction)s[]
 bantime = -1
 maxretry = 3
 
@@ -747,22 +753,24 @@ logpath = /var/log/nsd.log
 [asterisk]
 
 port     = 5060,5061
-action = iptables-allports[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
-        iptables-allports[protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
-        hostsdeny[]
-        shorewall[]
+%(banaction)s[name=asterisk-tcp, port=5060, protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
+        %(banaction)s[name=asterisk-udp, port=5061, protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
+        %(mta)s-whois[name=asterisk, dest=%(destemail)s]
 logpath = /var/log/asterisk/full
 enabled = true
 filter = asterisk
 findtime = 86400
 bantime = -1
 maxretry = 3
+action = %(banaction)s[name=asterisk-tcp, port=5060, protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
+        %(banaction)s[name=asterisk-udp, port=5061, protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
+        %(mta)s-whois[name=asterisk, dest=%(destemail)s]
 
 
 [freeswitch]
 
 port     = 5060,5061
-action = shorewall[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
+action = %(banaction)s[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
         iptables-multiport[protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
         hostsdeny[dest=%(destemail)s]
 logpath = /var/log/freeswitch/freeswitch.log
@@ -789,7 +797,7 @@ logpath = /var/log/secure
 maxretry = 5
 enabled = true
 filter = mysqld-auth
-action = shorewall[]
+action = %(banaction)s[name=mysqld-auth, port=3306, protocol=tcp]
 
 
 # Jail for more extended banning of persistent abusers
@@ -807,9 +815,8 @@ bantime = -1
 findtime = 86400
 enabled = true
 filter = recidive
-action = shorewall[]
+action = %(banaction)s[name=recidive]
         hostsdeny[]
-        iptables-allports[]
 maxretry = 2
 
 
@@ -822,7 +829,7 @@ banaction = shorewall
 logpath = /var/log/secure
 enabled = true
 filter = pam-generic
-action = shorewall[]
+action = %(banaction)s[name=pam-generic, protocol=tcp]
 maxretry = 2
 bantime = -1
 
@@ -897,9 +904,9 @@ findtime     = 1
 enabled = false
 
 [apache-pass]
-enabled = true
+enabled = false
 filter = apache-pass
-action = shorewall[]
+action = %(banaction)s[name=apache-pass, port="80,443", protocol=tcp]
 logpath = /etc/httpd/logs/error_log
         /var/log/httpd/access_log
 
@@ -931,29 +938,10 @@ logpath = /etc/httpd/logs/error_log
 #          sendmail-whois[name=fusionpbx, dest=root, sender=fail2ban@example.org] #no smtp server installed
 #maxretry = 10
 
-[ssh-iptables]
-enabled  = true
-filter   = sshd
-action = iptables-new[name=SSH, port=ssh, protocol=tcp]
-        shorewall[]
-logpath  = /var/log/secure
-maxretry = 3
-bantime = 7200
-
-[asterisk-iptables]                                                                                        
-enabled = true
-filter   = asterisk                                                                                        
-action = shorewall[name=ASTERISK, port=5060]
-        iptables-allports[name=ASTERISK, port=5061]
-logpath = /var/log/asterisk/full
-maxretry = 2
-bantime = -1 
-
 [ast-cli-attck]                                                                                            
 enabled = true
 filter   = asterisk_cli                                                                                    
-action = iptables-new[name=AST_CLI_Attack, port=5060]
-        shorewall[]
+action = %(banaction)s[name=AST_CLI_Attack, port=5060, protocol=tcp]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
@@ -961,8 +949,7 @@ bantime = -1
 [asterisk-manager]                                                                                         
 enabled = true
 filter   = asterisk_manager                                                                                
-action = iptables-new[name=AST_MANAGER, port=5038]
-        shorewall[]
+action = %(banaction)s[name=AST_MANAGER, port=5038, protocol=tcp]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
@@ -970,7 +957,6 @@ bantime = -1
 [mor_ddos]                                                                                                 
 enabled = true
 filter   = mor_ddos                                                                                        
-action = iptables-multiport[name=mor_ddos]
-        shorewall[]
+action = %(banaction)s[name=mor_ddos, port=5060, protocol=tcp]
 logpath = /var/log/httpd/error_log
 bantime = 3600
