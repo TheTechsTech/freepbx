@@ -12,10 +12,14 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois 
     
 # Install Shorewall firewall and fail2ban action 
-RUN yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
-    && yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.0-1.el7.noarch.rpm \
-    && yum install -y http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.0-1.el7.noarch.rpm \
-    && yum install fail2ban-shorewall -y
+RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
+    && yum install shorewall-core-5.1.8.0-1.el7.noarch.rpm -y \
+    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.0-1.el7.noarch.rpm \
+    && yum install shorewall-5.1.8.0-1.el7.noarch.rpm -y \
+    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.0-1.el7.noarch.rpm \
+    && yum install shorewall-init-5.1.8.0-1.el7.noarch.rpm -y \
+    && yum install fail2ban-shorewall -y \
+    && rm -f shorewall-*
 	
 # Install php 5.6 repositories and php5.6w	
 RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear \
@@ -80,10 +84,8 @@ RUN systemctl start mariadb \
     && rm -rf /usr/src/freepbx 
     
 # Install Webmin repositorie and Webmin
-RUN echo " " > /etc/yum.repos.d/webmin.repo \
-   && sed -i '1 i\[Webmin]\nname=Webmin Distribution Neutral\n#baseurl=http://download.webmin.com/download/yum\nmirrorlist=http://download.webmin.com/download/yum/mirrorlist\nenabled=1' /etc/yum.repos.d/webmin.repo \
-   && wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-   && yum install webmin -y && rm jcameron-key.asc
+RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
+    && yum install webmin -y && rm jcameron-key.asc
 
 RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
     && sed -i "s#10000#9000#" /etc/webmin/miniserv.conf \
