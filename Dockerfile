@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7 
 MAINTAINER Lawrence Stubbs <technoexpressnet@gmail.com>
 
 # Install Required Dependencies    
@@ -12,14 +12,10 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois 
     
 # Install Shorewall firewall and fail2ban action 
-RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.1-1.el7.noarch.rpm \
-    && yum install shorewall-core-5.1.8.1-1.el7.noarch.rpm -y \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.1-1.el7.noarch.rpm \
-    && yum install shorewall-5.1.8.1-1.el7.noarch.rpm -y \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.1-1.el7.noarch.rpm \
-    && yum install shorewall-init-5.1.8.1-1.el7.noarch.rpm -y \
-    && yum install fail2ban-shorewall -y \
-    && rm -f shorewall-*
+RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-core-5.1.8-1.noarch.rpm -y \
+    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-5.1.8-1.noarch.rpm -y \
+    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-init-5.1.8-1.noarch.rpm -y \
+    && yum install fail2ban-shorewall -y
 	
 # Install php 5.6 repositories and php5.6w	
 RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear \
