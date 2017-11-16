@@ -91,7 +91,10 @@ RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd
     && sed -i "s#STARTUP_ENABLED=No#STARTUP_ENABLED=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
-	&& systemctl enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service containerstartup.service \
+    && sed -i 's#default.target#multi-user.target#' /etc/systemd/system/containerstartup.service \
+	&& systemctl enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service \
+	&& chkconfig webmin on \
+    && chkconfig containerstartup on \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
     && echo "root:freepbx" | chpasswd
