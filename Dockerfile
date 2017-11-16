@@ -12,12 +12,12 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois 
     
 # Install Shorewall firewall and fail2ban action 
-RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.0-1.el7.noarch.rpm \
-    && yum install shorewall-core-5.1.8.0-1.el7.noarch.rpm -y \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.0-1.el7.noarch.rpm \
-    && yum install shorewall-5.1.8.0-1.el7.noarch.rpm -y \
-    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.0-1.el7.noarch.rpm \
-    && yum install shorewall-init-5.1.8.0-1.el7.noarch.rpm -y \
+RUN wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-core-5.1.8.1-1.el7.noarch.rpm \
+    && yum install shorewall-core-5.1.8.1-1.el7.noarch.rpm -y \
+    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-5.1.8.1-1.el7.noarch.rpm \
+    && yum install shorewall-5.1.8.1-1.el7.noarch.rpm -y \
+    && wget -q http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-7/noarch/shorewall-init-5.1.8.1-1.el7.noarch.rpm \
+    && yum install shorewall-init-5.1.8.1-1.el7.noarch.rpm -y \
     && yum install fail2ban-shorewall -y \
     && rm -f shorewall-*
 	
@@ -55,7 +55,7 @@ RUN chown asterisk. /var/run/asterisk \
 	&& chown -R asterisk. /var/spool/asterisk \
 	&& chown -R asterisk. /usr/lib64/asterisk \
 	&& chown -R asterisk. /var/www/     
-COPY conf /etc/
+COPY etc /etc/
 RUN chown -R asterisk. /etc/asterisk \	
 	&& chmod 775 /etc/asterisk/cdr_adaptive_odbc.conf  
 
@@ -86,6 +86,8 @@ RUN systemctl start mariadb \
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin -y && rm jcameron-key.asc
+ 
+RUN yum install yum-versionlock -y && yum versionlock systemd   
 
 RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
     && sed -i "s#10000#9000#" /etc/webmin/miniserv.conf \
@@ -93,13 +95,15 @@ RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd
     && sed -i "s#STARTUP_ENABLED=No#STARTUP_ENABLED=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
-	&& systemctl enable iptables.service denyhosts.service shorewall.service fail2ban.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service \
-    && cat /etc/startup.bashrc >> /etc/bashrc \
+	&& systemctl enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service containerstartup.service \
+    && chmod +x /etc/containerstartup.sh \
+    && mv -f /etc/containerstartup.sh /containerstartup.sh \
     && echo "root:freepbx" | chpasswd
 
-ENV SSHPORT=2122
-ENV WEBMINPORT=9000  
+ENV SSHPORT 2122
+ENV WEBMINPORT 9000
+ENV INTERFACE eth0 
 
 EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9000/tcp 9000/udp 10000-10100/tcp 10000-10100/udp
 
-CMD ["/bin/bash"]
+ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
