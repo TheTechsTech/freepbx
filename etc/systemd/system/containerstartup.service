@@ -1,11 +1,10 @@
 [Unit]
 Description=Check docker's 'ENV' on container startup
-After=webmin.service
+After=multi-user.target
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
 ExecStart=/containerstartup.sh
 
 [Install]
-WantedBy=default.target
+WantedBy=custom.target
