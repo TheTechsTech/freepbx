@@ -4,22 +4,20 @@ export WEBMINPORT
 export INTERFACE
 
 source /etc/container.ini
-
 if [[ $SSHPORT =~ ^[0-9]+$ ]] && [ "$SSH" != "$SSHPORT" ]
 then 
     service sshd stop
     sed -i "s#Port $SSH#Port $SSHPORT#" /etc/ssh/sshd_config
     sed -i "s#$SSH#$SSHPORT#" /etc/container.ini
     service sshd start
-fi
-
-if [ "$SSHPORT" == "off" ]
+elif [ "$SSHPORT" == "off" ]
 then
     systemctl disable sshd.service
-    if pgrep -x "sshd" >/dev/null
-    then 
-        service sshd stop
-    fi
+    service sshd stop  
+elif [[ $SSHPORT =~ ^[0-9]+$ ]] && ! pgrep -x "sshd" > /dev/null
+then   
+    systemctl enable sshd.service
+    service sshd start
 fi
 
 source <( grep port /etc/webmin/miniserv.conf ) 

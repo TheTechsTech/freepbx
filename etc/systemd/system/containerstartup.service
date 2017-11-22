@@ -1,10 +1,11 @@
 [Unit]
 Description=Check docker's 'ENV' on container startup
-After=multi-user.target
+After=iptables.service, denyhosts.service, shorewall.service, fail2ban.service, mariadb.service, asterisk.service, httpd.service, sendmail.service, freepbx.service, crond.service, rsyslog.service, webmin.service
 
 [Service]
-Type=simple
+Type=oneshot
+RemainAfterExit=no
 ExecStart=/containerstartup.sh
 
 [Install]
-WantedBy=custom.target
+WantedBy=multi-user.target

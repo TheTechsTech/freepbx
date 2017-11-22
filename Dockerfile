@@ -57,19 +57,22 @@ RUN chown -R asterisk. /etc/asterisk \
 
 # Fixes issue with running systemD inside docker builds 
 # From https://github.com/gdraheim/docker-systemctl-replacement
-COPY systemctl.py /usr/bin/systemctl
-ENV container=docker
-
+COPY systemctl.py /usr/bin/systemctl.py
+RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
+    && chmod +x /usr/bin/systemctl.py \
+    && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
+    
 # Install FreePBX 
-RUN systemctl start mariadb \
+RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
+    && systemctl start mariadb \
 	&& systemctl start httpd \
+    && systemctl start asterisk \
 	&& mkdir -p /var/www/html/admin/modules/pm2/node/logs \
     && mkdir -p /var/www/html/admin/modules/ucp/node/logs \
     && chmod -R 775 /var/www/html/admin/modules/pm2/node \
     && chmod -R 775 /var/www/html/admin/modules/ucp/node \
     && chown -R asterisk:asterisk /var/www/html/admin/modules/pm2 \
     && chown -R asterisk:asterisk /var/www/html/admin/modules/ucp \
-    && sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd /usr/src \
     && wget -q http://mirror.freepbx.org/modules/packages/freepbx/freepbx-14.0-latest.tgz \
     && tar xfz freepbx-14.0-latest.tgz \
@@ -83,26 +86,43 @@ RUN systemctl start mariadb \
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin -y && rm jcameron-key.asc
  
-RUN yum install yum-versionlock -y && yum versionlock systemd   
+RUN yum install yum-versionlock -y && yum versionlock systemd 
 
+RUN systemctl stop dbus \
+    && systemctl stop firewalld \
+    && systemctl.original disable dbus firewalld \
+    && (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
+    systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /lib/systemd/system/multi-user.target.wants/*; \
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*; \
+    rm -f /lib/systemd/system/anaconda.target.wants/*; \
+    rm -f /etc/dbus-1/system.d/*; \
+    rm -f /etc/systemd/system/sockets.target.wants/*; 
+#VOLUME [ "/sys/fs/cgroup" ]
+    
 RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
-    && sed -i "s#10000#9000#" /etc/webmin/miniserv.conf \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
+    && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
+    && sed -i "s#9000,#9990,#" /etc/shorewall/rules \
     && sed -i "s#STARTUP_ENABLED=No#STARTUP_ENABLED=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
-	&& systemctl enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service \
-    && ln -sf /etc/systemd/system/custom.target /etc/systemd/system/default.target \
-	&& chkconfig webmin on \
-    && chkconfig containerstartup on \
+    && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
+	&& systemctl.original enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service containerstartup.service \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
     && echo "root:freepbx" | chpasswd
-
+  
+ENV container docker    
 ENV SSHPORT 2122
-ENV WEBMINPORT 9000
+ENV WEBMINPORT 9990
 ENV INTERFACE eth0 
 
-EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9000/tcp 9000/udp 10000-10100/tcp 10000-10100/udp
+EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
 
-ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
+#ENTRYPOINT ["/usr/sbin/init"]
+#ENTRYPOINT ["/usr/bin/systemctl.original"]
+CMD ["/usr/bin/systemctl","default","--init"]
