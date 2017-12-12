@@ -9,7 +9,7 @@
                `-e WEBMINPORT=xxxx`
  * SSH on Port 2122, can be changed or turned off on `docker run` by passing:
                `-e SSHPORT="off"` or `-e SSHPORT=xxxx`
- * Asterisk 14.6.2
+ * Asterisk 14.7.3
  * FreePBX 14
 
 ## Running FreePBX
@@ -34,11 +34,10 @@ docker run --name freepbx \
 -v freepbx-log:/var/log \
 -v freepbx-lib:/var/lib \
 -v freepbx-home:/home \
--v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 -v /etc/resolv.conf:/etc/resolv.conf:ro \
 --cap-add=NET_ADMIN --net=macvlan_bridge \
 --mac-address=00:00:00:00:00:00 --ip=111.222.333.446 --hostname=free.pbx.host \
---restart=always -itd technoexpress/freepbx:centos7
+--restart=always -itd technoexpress/freepbx
 ```
 ## Setup Tips
 Using the Webmin UI visit https://ip_or_hostname:9000

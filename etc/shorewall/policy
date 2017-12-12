@@ -1,6 +1,5 @@
 #SOURCE         DEST            POLICY          LOG LEVEL       LIMIT:BURST
-net             fw              DROP            info
-net             all             ACCEPT
+$FW             all             ACCEPT
+net             all             DROP            info
 # The FOLLOWING POLICY MUST BE LAST
 all             all             REJECT          info
-

@@ -11,10 +11,11 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois 
     
-# Install Shorewall firewall and fail2ban action 
-RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-core-5.1.8-1.noarch.rpm -y \
-    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-5.1.8-1.noarch.rpm -y \
-    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.8/shorewall-init-5.1.8-1.noarch.rpm -y \
+# Install Shorewall and the fail2ban action 
+RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-core-5.1.9-0base.noarch.rpm -y \
+    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-5.1.9-0base.noarch.rpm -y \
+    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-init-5.1.9-0base.noarch.rpm -y \
+    && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y
 	
 # Install php 5.6 repositories and php5.6w	
@@ -67,6 +68,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && systemctl start mariadb \
 	&& systemctl start httpd \
     && systemctl start asterisk \
+    && systemctl stop asterisk \
 	&& mkdir -p /var/www/html/admin/modules/pm2/node/logs \
     && mkdir -p /var/www/html/admin/modules/ucp/node/logs \
     && chmod -R 775 /var/www/html/admin/modules/pm2/node \
@@ -84,12 +86,9 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-    && yum install webmin -y && rm jcameron-key.asc
+    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
  
-RUN yum install yum-versionlock -y && yum versionlock systemd 
-
-RUN systemctl stop dbus \
-    && systemctl stop firewalld \
+RUN systemctl stop firewalld \
     && systemctl.original disable dbus firewalld \
     && (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     systemd-tmpfiles-setup.service ] || rm -f $i; done); \
@@ -101,9 +100,10 @@ RUN systemctl stop dbus \
     rm -f /lib/systemd/system/anaconda.target.wants/*; \
     rm -f /etc/dbus-1/system.d/*; \
     rm -f /etc/systemd/system/sockets.target.wants/*; 
-#VOLUME [ "/sys/fs/cgroup" ]
     
-RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
+RUN mkdir /tftpboot \
+    && chmod 777 /tftpboot \
+    && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
     && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
     && sed -i "s#9000,#9990,#" /etc/shorewall/rules \
@@ -111,18 +111,21 @@ RUN touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
-	&& systemctl.original enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service sendmail.service freepbx.service crond.service rsyslog.service webmin.service containerstartup.service \
+	&& systemctl.original disable sendmail.service \
+	&& systemctl.original enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
+    && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
     && echo "root:freepbx" | chpasswd
   
-ENV container docker    
+ENV container docker
+ENV HTTPPORT 80
+ENV SSLPORT 443
 ENV SSHPORT 2122
 ENV WEBMINPORT 9990
 ENV INTERFACE eth0 
 
 EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
 
-#ENTRYPOINT ["/usr/sbin/init"]
-#ENTRYPOINT ["/usr/bin/systemctl.original"]
-CMD ["/usr/bin/systemctl","default","--init"]
+ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
+#CMD ["/usr/bin/bash"]

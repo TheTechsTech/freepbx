@@ -1,7 +1,6 @@
 ##############################################################################################################################################################
 #ACTION SOURCE  DEST    PROTO   DPORT   SPORT   ORIGDEST    RATE    USER    MARK    CONNLIMIT   TIME    HEADERS SWITCH  HELPER
 # Permit all ICMP traffic FROM the firewall TO the net zone
-ACCEPT  $FW net
 #Allow incoming TCP ports
 ACCEPT	net	$FW	tcp	25,80,443,465,2122,5060,5061,8001,8003,8088,8089,9000,10000:10100
 ACCEPT net $FW icmp 8 - - 1/sec
