@@ -1,7 +1,7 @@
 FROM centos:7 
 MAINTAINER Lawrence Stubbs <technoexpressnet@gmail.com>
 
-# Install Required Dependencies    
+# Install Required Dependencies
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum update -y && yum -y install icu gcc-c++ sudo lynx tftp-server unixODBC mariadb-devel \
@@ -9,19 +9,19 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
     fail2ban-hostsdeny denyhosts openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois 
-    
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois
+
 # Install Shorewall and the fail2ban action 
 RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-core-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-init-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y
-	
+
 # Install php 5.6 repositories and php5.6w	
 RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear \
         php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip 
- 		
+
 # Install nodejs	
 RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash - && sudo yum install -y nodejs
 
@@ -62,7 +62,7 @@ COPY systemctl.py /usr/bin/systemctl.py
 RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && chmod +x /usr/bin/systemctl.py \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
-    
+
 # Install FreePBX 
 RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && systemctl start mariadb \
