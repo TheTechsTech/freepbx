@@ -4,12 +4,14 @@ MAINTAINER Lawrence Stubbs <technoexpressnet@gmail.com>
 # Install Required Dependencies
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
-    && yum update -y && yum -y install icu gcc-c++ sudo lynx tftp-server unixODBC mariadb-devel \
+	&& yum update -y 
+
+RUN yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny denyhosts openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools perl-devel whois
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois 
 
 # Install Shorewall and the fail2ban action 
 RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-core-5.1.9-0base.noarch.rpm -y \
@@ -17,20 +19,21 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-init-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y
-
+ 
 # Install php 5.6 repositories and php5.6w	
-RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear \
-        php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip 
-
+RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process \
+        php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip 
+ 
 # Install nodejs	
 RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash - && sudo yum install -y nodejs
-
+ 
 # Asterisk and FreePBX Repositorie
 RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n[pbx]\nname=pbx\n#mirrorlist=http://mirrorlist.freepbxdistro.org/?pbxver=10.13.66&release=14.4&arch=$basearch&repo=pbx\nbaseurl=http://yum.freepbxdistro.org/pbx/10.13.66/$basearch/\ngpgcheck=0\nenabled=1' /etc/yum.repos.d/FreePBX.repo 
 
 # Install lame jansson iksemel and pjproject 
-RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm \
-    && yum --enablerepo=forensics install lame jansson iksemel pjproject -y
+RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm
+RUN yum --enablerepo=forensics install lame jansson pjproject -y
+RUN yum install http://cbs.centos.org/kojifiles/packages/iksemel/1.4/6.el7/x86_64/iksemel-1.4-6.el7.x86_64.rpm -y
 
 # Install Asterisk, Add Asterisk user, Download extra sounds
 RUN yum install ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.1/x86_64/os/Packages/libical-0.48-6.el7.x86_64.rpm -y 
@@ -120,7 +123,7 @@ RUN mkdir /tftpboot \
   
 ENV container docker
 ENV HTTPPORT 80
-ENV SSLPORT 443
+ENV SSLPORT 443 
 ENV SSHPORT 2122
 ENV WEBMINPORT 9990
 ENV INTERFACE eth0 
@@ -128,4 +131,3 @@ ENV INTERFACE eth0
 EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
 
 ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
-#CMD ["/usr/bin/bash"]
