@@ -115,7 +115,7 @@ RUN mkdir /tftpboot \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
 	&& systemctl.original disable sendmail.service \
-	&& systemctl.original enable iptables.service denyhosts.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
+	&& systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
     && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
