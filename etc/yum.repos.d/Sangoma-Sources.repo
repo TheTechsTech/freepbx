@@ -1,0 +1,26 @@
+# Source RPM Repositories
+
+[src-sng]
+name=SRPMs for Sanoma specific packages
+baseurl=http://sng7.com/src
+gpgcheck=0
+enabled=0
+
+[src-sng-os]
+name=SRPMs for Sanoma OS
+baseurl=http://sng7.com/sng7/src/os
+gpgcheck=0
+enabled=0
+
+[src-sng-updates]
+name=SRPMs for Sanoma Updates
+baseurl=http://sng7.com/sng7/src/updates
+gpgcheck=0
+enabled=0
+
+[src-sng-epel]
+name=SRPMs for Epel Packages
+baseurl=http://sng7.com/sng7/src/epel
+gpgcheck=0
+enabled=0
+

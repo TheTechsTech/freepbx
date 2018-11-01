@@ -1,0 +1,8 @@
+[fasttrack]
+name=Sangoma-7 - fasttrack
+mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=fasttrack&dist=$dist
+#baseurl=http:/package1.sangoma.net/sng7/$releasever/fasttrack/$basearch/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
