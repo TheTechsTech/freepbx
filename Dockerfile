@@ -3,11 +3,9 @@ FROM centos:7
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
-	&& yum update -y
-
-RUN yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
+	&& yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
@@ -40,8 +38,7 @@ RUN yum install lame jansson pjproject libical libresample -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
-        asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 
