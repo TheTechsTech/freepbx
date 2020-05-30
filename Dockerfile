@@ -2,11 +2,11 @@ FROM centos:7
 
 LABEL maintainer="technoexpressnet@gmail.com"
 
-# Install Required Dependencies
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
 	&& yum update -y
 
+# Install Required Dependencies
 RUN yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
@@ -33,8 +33,6 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n[pbx]\nname=pbx\n#mirrorlist=http://mirrorlist.freepbxdistro.org/?pbxver=10.13.66&release=14.4&arch=$basearch&repo=pbx\nbaseurl=http://yum.freepbxdistro.org/pbx/10.13.66/$basearch/\ngpgcheck=0\nenabled=1' /etc/yum.repos.d/FreePBX.repo
 
 # Install lame jansson iksemel and pjproject
-# RUN rpm -Uvh https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-forensics-tools-release-7-15.noarch.rpm \
-
 # Install Asterisk, Add Asterisk user, Download extra sounds
 COPY etc /etc/
 
