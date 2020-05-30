@@ -38,11 +38,6 @@ RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n
 # Install Asterisk, Add Asterisk user, Download extra sounds
 COPY etc /etc/
 
-RUN rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-7-1.noarch.rpm \
-    && rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-rf-7-1.noarch.rpm \
-    && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-LUX \
-    && yum update -y --skip-broken
-
 RUN yum install lame jansson pjproject -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
