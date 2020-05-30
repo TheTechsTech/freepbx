@@ -33,8 +33,8 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n[pbx]\nname=pbx\n#mirrorlist=http://mirrorlist.freepbxdistro.org/?pbxver=10.13.66&release=14.4&arch=$basearch&repo=pbx\nbaseurl=http://yum.freepbxdistro.org/pbx/10.13.66/$basearch/\ngpgcheck=0\nenabled=1' /etc/yum.repos.d/FreePBX.repo
 
 # Install lame jansson iksemel and pjproject
-RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm \
-    && yum --enablerepo=forensics install lame jansson pjproject -y \
+RUN rpm -Uvh https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-forensics-tools-release-7-15.noarch.rpm \
+    && yum install lame jansson pjproject -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
 # Install Asterisk, Add Asterisk user, Download extra sounds
@@ -46,9 +46,9 @@ RUN rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-7-1.noarch.rpm \
     && yum update -y --skip-broken
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum --disablerepo=forensics install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
+    && yum install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
         asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum --disablerepo=forensics install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
+    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 
 # Copy configs and set Asterisk ownership permissions
