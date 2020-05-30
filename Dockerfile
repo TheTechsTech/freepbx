@@ -34,7 +34,8 @@ RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n
 # Install Asterisk, Add Asterisk user, Download extra sounds
 COPY etc /etc/
 
-RUN yum install lame jansson pjproject libical libresample -y \
+RUN yum update -y \
+    && yum install lame jansson pjproject libical libresample -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
