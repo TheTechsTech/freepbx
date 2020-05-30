@@ -46,9 +46,9 @@ RUN rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-7-1.noarch.rpm \
     && yum update -y --skip-broken
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
+    && yum --disablerepo=forensics install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
         asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
+    && yum --disablerepo=forensics install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 
 # Copy configs and set Asterisk ownership permissions
@@ -92,7 +92,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
+    && yum --disablerepo=forensics install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN systemctl stop firewalld \
     && systemctl.original disable dbus firewalld \
