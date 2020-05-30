@@ -39,10 +39,12 @@ RUN echo " " > /etc/yum.repos.d/FreePBX.repo && sed -i '1 i\#Core PBX Packages\n
 COPY etc /etc/
 
 RUN yum install lame jansson pjproject -y \
-    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
+    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y \
+    && yum install https://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
+    && yum intall http://mirror.centos.org/centos/7/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
         asterisk16-configs asterisk16-odbc asterisk16-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
