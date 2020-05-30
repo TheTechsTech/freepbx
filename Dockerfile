@@ -9,10 +9,11 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
 
 RUN yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
-    fail2ban-hostsdeny denyhosts openssh-server openssh-server-sysvinit sendmail sendmail-cf \
+    fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois \
+    && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm
 
 # Install Shorewall and the fail2ban action
 RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-core-5.1.9-0base.noarch.rpm -y \
@@ -40,6 +41,8 @@ RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm \
 RUN yum install ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.1/x86_64/os/Packages/libical-0.48-6.el7.x86_64.rpm -y \
     && yum install ftp://ftp.pbone.net/mirror/rnd.rajven.net/centos/7.0.1406/os/x86_64/libresample-0.1.3-22cnt7.x86_64.rpm -y
 
+COPY etc /etc/
+
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
         asterisk16-configs asterisk16-odbc asterisk16-resample -y \
@@ -57,7 +60,7 @@ RUN chown asterisk. /var/run/asterisk \
 	&& chown -R asterisk. /var/spool/asterisk \
 	&& chown -R asterisk. /usr/lib64/asterisk \
 	&& chown -R asterisk. /var/www/
-COPY etc /etc/
+
 RUN chown -R asterisk. /etc/asterisk \
 	&& chmod 775 /etc/asterisk/cdr_adaptive_odbc.conf
 
