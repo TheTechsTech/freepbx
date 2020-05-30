@@ -38,20 +38,18 @@ RUN rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
 # Install Asterisk, Add Asterisk user, Download extra sounds
-RUN yum install ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.1/x86_64/os/Packages/libical-0.48-6.el7.x86_64.rpm -y \
-    && yum install ftp://ftp.pbone.net/mirror/rnd.rajven.net/centos/7.0.1406/os/x86_64/libresample-0.1.3-22cnt7.x86_64.rpm -y
-
 COPY etc /etc/
-
-RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
-        asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 RUN rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-7-1.noarch.rpm \
     && rpm -Uvh http://repo.iotti.biz/CentOS/7/noarch/lux-release-rf-7-1.noarch.rpm \
     && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-LUX \
     && yum update -y --skip-broken
+
+RUN adduser asterisk -m -c "Asterisk User" \
+    && yum install libical libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
+        asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
+
 
 # Copy configs and set Asterisk ownership permissions
 RUN chown asterisk. /var/run/asterisk \
