@@ -40,7 +40,7 @@ COPY etc /etc/
 
 RUN yum install lame jansson pjproject -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y \
-    && yum intall http://mirror.centos.org/centos/7/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
+    && yum install http://mirror.centos.org/centos/7/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
     && yum install libresample -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
@@ -90,7 +90,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-    && yum --disablerepo=forensics install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
+    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN systemctl stop firewalld \
     && systemctl.original disable dbus firewalld \
