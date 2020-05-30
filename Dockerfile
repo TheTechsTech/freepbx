@@ -2,11 +2,11 @@ FROM centos:7
 
 LABEL maintainer="technoexpressnet@gmail.com"
 
+# Install Required Dependencies
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
 	&& yum update -y
 
-# Install Required Dependencies
 RUN yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
