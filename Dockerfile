@@ -3,6 +3,10 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
+
+RUN yum install https://www.rpmfind.net/linux/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
+    && yum install https://www.rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y
+
 RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
 	&& yum -y install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
