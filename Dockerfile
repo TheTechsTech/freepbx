@@ -40,7 +40,8 @@ RUN yum update -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install libresample asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install libresample -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y --skip-broken \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions
