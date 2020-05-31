@@ -37,7 +37,6 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 COPY etc /etc/
 
 RUN yum install https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-forensics-tools-release-7-15.noarch.rpm -y \
-    && yum install http://mirror.ghettoforge.org/distributions/gf/el/7/gf/x86_64/gf-release-7-10.gf.el7.noarch.rpm -y \
     && yum update -y \
     && yum install lame jansson pjproject -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
