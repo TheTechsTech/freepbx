@@ -40,7 +40,7 @@ RUN yum install lame jansson pjproject -y \
     && yum -y install libtsan
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install --enablerepo=gf asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install --enablerepo=gf asterisk14 asterisk14-flite asterisk14-doc asterisk14-voicemail asterisk14-configs asterisk14-odbc asterisk14-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y \
     && yum update -y
 
