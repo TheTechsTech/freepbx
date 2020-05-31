@@ -1,8 +1,0 @@
-#Core PBX Packages
-[pbx]
-name=pbx
-#mirrorlist=http://mirrorlist.freepbxdistro.org/?pbxver=10.13.66&release=14.4&arch=$basearch&repo=pbx
-baseurl=http://yum.freepbxdistro.org/pbx/10.13.66/$basearch/
-gpgcheck=0
-enabled=1
- 
