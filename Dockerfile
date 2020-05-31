@@ -3,9 +3,7 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-
-RUN yum install https://www.rpmfind.net/linux/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
-    && yum install https://www.rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y
+RUN yum install https://www.rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y
 
 RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
 	&& rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
@@ -39,10 +37,10 @@ COPY etc /etc/
 RUN yum update -y \
     && yum install lame jansson pjproject -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y \
-    && yum -y install http://mirror.ghettoforge.org/distributions/gf/el/7/gf/x86_64/gf-release-7-10.gf.el7.noarch.rpm
+    && yum install http://mirror.ghettoforge.org/distributions/gf/el/7/gf/x86_64/libresample-0.1.3-20.gf.el7.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install --enablerepo=gf asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions
