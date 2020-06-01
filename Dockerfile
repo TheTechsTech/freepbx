@@ -35,7 +35,7 @@ RUN yum install https://ast.tucny.com/repo/tucny-asterisk.repo -y \
 COPY etc /etc/
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 -y \
+    && yum install asterisk-16 -y \
     && yum install asterisk-sounds-core-en-* -y
 
 RUN yum update -y
