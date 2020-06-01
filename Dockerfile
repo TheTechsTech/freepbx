@@ -40,8 +40,8 @@ RUN yum install https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-
     && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum --skip-broken install asterisk16 asterisk16-tds asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
+    && yum install asterisk16 asterisk16-tds asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk-sounds asterisk-sounds-en-gsm -y
 
 # Copy configs and set Asterisk ownership permissions
 RUN chown asterisk. /var/run/asterisk \
