@@ -3,8 +3,11 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
-    && rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
+RUN yum install https://www.rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
+    && yum install https://mirrors.uni-ruse.bg/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
+    && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+
+RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm \
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
@@ -29,12 +32,11 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
 # Install Asterisk, Add Asterisk user, Download extra sounds
-COPY etc /etc/
-
 RUN yum install https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-forensics-tools-release-7-15.noarch.rpm -y \
-    && yum install lame jansson pjproject libical -y \
-    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y \
-    && yum install https://mirrors.uni-ruse.bg/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y
+    && yum install lame jansson pjproject -y \
+    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
+
+COPY etc /etc/
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-tds asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
