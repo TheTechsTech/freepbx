@@ -29,16 +29,14 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
 # Install Asterisk, Add Asterisk user, Download extra sounds
-RUN yum install https://ast.tucny.com/repo/tucny-asterisk.repo -y \
-    && yum install lame jansson pjproject iksemel -y
-
 COPY etc /etc/
+
+RUN yum update -y \
+    && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk-16 -y \
     && yum install asterisk-sounds-core-en-* -y
-
-RUN yum update -y
 
 # Copy configs and set Asterisk ownership permissions
 RUN chown asterisk. /var/run/asterisk \
