@@ -57,8 +57,7 @@ RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
 # Install FreePBX
-RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
-    && systemctl start mariadb \
+RUN systemctl start mariadb \
 	&& systemctl start httpd \
     && systemctl start asterisk \
     && systemctl stop asterisk \
