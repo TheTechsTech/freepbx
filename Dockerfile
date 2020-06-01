@@ -33,12 +33,16 @@ COPY etc /etc/
 
 RUN yum install https://forensics.cert.org/repository/centos/cert/7/x86_64/cert-forensics-tools-release-7-15.noarch.rpm -y \
     && yum install lame jansson pjproject -y \
-    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y
+    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/matthewdva:/epel:/el7/CentOS_7/x86_64/iksemel-1.4-6.8.x86_64.rpm -y \
+    && yum install https://www.rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
+    && yum install https://mirrors.uni-ruse.bg/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
+    && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/mnhauke/openSUSE_Tumbleweed/x86_64/libresample1-0.1.3-6.7.x86_64.rpm -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-tds asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum install asterisk-sounds asterisk-sounds-en-gsm -y \
-    && yum update -y
+    && yum install asterisk-sounds asterisk-sounds-en-gsm -y
+
+RUN yum update -y
 
 # Copy configs and set Asterisk ownership permissions
 RUN chown asterisk. /var/run/asterisk \
