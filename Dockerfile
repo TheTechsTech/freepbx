@@ -35,7 +35,7 @@ RUN yum update -y \
     && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk -y \
+    && yum install asterisk asterisk-tds asterisk16-mysql asterisk-voicemail asterisk16-sip asterisk16-pjsip asterisk-odbc asterisk16-xmpp asterisk-festival asterisk-misdn -y \
     && yum install asterisk-sounds-core-en-* -y
 
 # Copy configs and set Asterisk ownership permissions
