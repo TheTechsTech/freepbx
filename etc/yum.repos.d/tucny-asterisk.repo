@@ -18,11 +18,3 @@ mirrorlist=https://ast.tucny.com/mirrorlist.php?release=$releasever&arch=$basear
 enabled=1
 gpgcheck=1
 gpgkey=https://ast.tucny.com/repo/RPM-GPG-KEY-dtucny
-
-[asterisk-16]
-name=Asterisk 16 Packages @ tucny.com
-#baseurl=https://ast.tucny.com/repo/asterisk-16/el$releasever/$basearch/
-mirrorlist=https://ast.tucny.com/mirrorlist.php?release=$releasever&arch=$basearch&repo=asterisk-16
-enabled=0
-gpgcheck=1
-gpgkey=https://ast.tucny.com/repo/RPM-GPG-KEY-dtucny

@@ -3,8 +3,9 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
-    && rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
+RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+
+RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm \
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
