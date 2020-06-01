@@ -35,8 +35,9 @@ RUN yum update -y \
     && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk asterisk-tds asterisk16-mysql asterisk-voicemail asterisk16-sip asterisk16-pjsip asterisk-odbc asterisk16-xmpp asterisk-festival asterisk-misdn -y \
-    && yum install asterisk-sounds-core-en-* -y
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
+        asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions
 RUN chown asterisk. /var/run/asterisk \
@@ -52,12 +53,24 @@ RUN chown -R asterisk. /etc/asterisk \
 # Fixes issue with running systemD inside docker builds
 # From https://github.com/gdraheim/docker-systemctl-replacement
 COPY systemctl.py /usr/bin/systemctl.py
+
 RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && chmod +x /usr/bin/systemctl.py \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
 # Install FreePBX
-RUN cd /usr/src \
+RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
+    && systemctl start mariadb \
+	&& systemctl start httpd \
+    && systemctl start asterisk \
+    && systemctl stop asterisk \
+	&& mkdir -p /var/www/html/admin/modules/pm2/node/logs \
+    && mkdir -p /var/www/html/admin/modules/ucp/node/logs \
+    && chmod -R 775 /var/www/html/admin/modules/pm2/node \
+    && chmod -R 775 /var/www/html/admin/modules/ucp/node \
+    && chown -R asterisk:asterisk /var/www/html/admin/modules/pm2 \
+    && chown -R asterisk:asterisk /var/www/html/admin/modules/ucp \
+    && cd /usr/src \
     && wget -q http://mirror.freepbx.org/modules/packages/freepbx/freepbx-15.0-latest.tgz \
     && tar xfz freepbx-15.0-latest.tgz \
     && rm -f freepbx-15.0-latest.tgz \
