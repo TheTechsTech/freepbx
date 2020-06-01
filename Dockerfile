@@ -57,17 +57,7 @@ RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
 # Install FreePBX
-RUN systemctl start mariadb \
-	&& systemctl start httpd \
-    && systemctl start asterisk \
-    && systemctl stop asterisk \
-	&& mkdir -p /var/www/html/admin/modules/pm2/node/logs \
-    && mkdir -p /var/www/html/admin/modules/ucp/node/logs \
-    && chmod -R 775 /var/www/html/admin/modules/pm2/node \
-    && chmod -R 775 /var/www/html/admin/modules/ucp/node \
-    && chown -R asterisk:asterisk /var/www/html/admin/modules/pm2 \
-    && chown -R asterisk:asterisk /var/www/html/admin/modules/ucp \
-    && cd /usr/src \
+RUN cd /usr/src \
     && wget -q http://mirror.freepbx.org/modules/packages/freepbx/freepbx-15.0-latest.tgz \
     && tar xfz freepbx-15.0-latest.tgz \
     && rm -f freepbx-15.0-latest.tgz \
