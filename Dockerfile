@@ -98,8 +98,7 @@ RUN systemctl stop firewalld \
     rm -f /etc/dbus-1/system.d/*; \
     rm -f /etc/systemd/system/sockets.target.wants/*;
 
-RUN mkdir /tftpboot \
-    && chmod 777 /tftpboot \
+RUN chmod 777 /tftpboot \
     && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
     && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
