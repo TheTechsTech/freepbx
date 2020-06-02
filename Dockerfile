@@ -35,12 +35,11 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 # Install Asterisk, Add Asterisk user, Download extra sounds
 COPY etc /etc/
 
-RUN yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/iksemel-1.5-0.1.git978b733.el7.x86_64.rpm -y \
-    && yum update -y \
-    && yum install lame jansson pjproject -y
+RUN yum update -y \
+    && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample --skip-broken -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions

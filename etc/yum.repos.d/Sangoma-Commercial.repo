@@ -1,0 +1,7 @@
+[sng-commercial]
+name=Sangoma-$releasever - Commercial Modules
+mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=commercial&dist=$dist
+#baseurl=http:/package1.sangoma.net/sng7/$releasever/commercial/$basearch/
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Sangoma-7
+enabled=0
