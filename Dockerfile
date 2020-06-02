@@ -3,8 +3,10 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
-    && rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
+RUN yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/libresample-0.1.3-13.el7.centos.x86_64.rpm -y \
+    && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+
+RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm \
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
@@ -32,7 +34,6 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install 
 COPY etc /etc/
 
 RUN yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/iksemel-1.5-0.1.git978b733.el7.x86_64.rpm -y \
-    && yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/libresample-0.1.3-13.el7.centos.x86_64.rpm -y \
     && yum update -y \
     && yum install lame jansson pjproject -y
 
