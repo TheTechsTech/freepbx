@@ -75,8 +75,9 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd freepbx \
     && ./start_asterisk start \
     && ./install -n \
-    && rm -rf /usr/src/freepbx \
-    && wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
+    && rm -rf /usr/src/freepbx
+
+RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN systemctl stop firewalld \
