@@ -40,8 +40,7 @@ RUN yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/iksemel-1.
     && yum install lame jansson pjproject -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail \
-        asterisk16-configs asterisk16-odbc asterisk16-resample -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample --skip-broken -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions
