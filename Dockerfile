@@ -3,8 +3,7 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum install https://ast.tucny.com/repo/asterisk-common/el7/x86_64/libresample-0.1.3-13.el7.centos.x86_64.rpm -y \
-    && yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
+RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
     && yum install ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/mnhauke/openSUSE_Tumbleweed/x86_64/libresample1-0.1.3-6.7.x86_64.rpm -y \
     && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
 
