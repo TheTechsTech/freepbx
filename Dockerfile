@@ -8,7 +8,7 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
 
 RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm \
-    && yum -y --enablerepo=epel libresample install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
+    && yum -y --enablerepo=epel install libresample sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
