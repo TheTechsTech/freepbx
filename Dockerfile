@@ -1,4 +1,4 @@
-FROM centos:7.8.2003
+FROM centos:7
 
 LABEL maintainer="technoexpressnet@gmail.com"
 
