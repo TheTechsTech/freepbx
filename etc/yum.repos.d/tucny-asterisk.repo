@@ -13,7 +13,7 @@
 
 [asterisk-common]
 name=Asterisk Common Requirement Packages @ tucny.com
-#baseurl=https://ast.tucny.com/repo/asterisk-common/el$releasever/$basearch/
+baseurl=https://ast.tucny.com/repo/asterisk-common/el$releasever/$basearch/
 mirrorlist=https://ast.tucny.com/mirrorlist.php?release=$releasever&arch=$basearch&repo=asterisk-common
 enabled=1
 gpgcheck=1
