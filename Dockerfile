@@ -5,9 +5,8 @@ LABEL maintainer="technoexpressnet@gmail.com"
 # Install Required Dependencies
 RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
     && yum install http://yum.freepbxdistro.org/pbx/10.13.66/x86_64/RPMS/digium/libresample/0.1.3/libresample-0.1.3-11_centos6.x86_64.rpm -y \
-    && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
-
-RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
+    && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
+    && rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     && yum -y install https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el7/en/x86_64/rpmforge/RPMS/denyhosts-2.6-5.el7.rf.noarch.rpm \
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
@@ -17,21 +16,20 @@ RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois
 
 # Install Shorewall and the fail2ban action
+# Install php 5.6 repositories and php5.6w
+# Install nodejs
 RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-core-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-init-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
-    && yum install fail2ban-shorewall -y
-
-# Install php 5.6 repositories and php5.6w
-RUN yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip
-
-# Install nodejs
-RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install -y nodejs
+    && yum install fail2ban-shorewall -y \
+    && yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip \
+    && curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install -y nodejs
 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
 # Install Asterisk, Add Asterisk user, Download extra sounds
+# Copy configs and set Asterisk ownership permissions
 COPY etc /etc/
 
 RUN yum update -y \
@@ -39,17 +37,14 @@ RUN yum update -y \
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
-    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
-
-# Copy configs and set Asterisk ownership permissions
-RUN chown asterisk. /var/run/asterisk \
+    && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y \
+    && chown asterisk. /var/run/asterisk \
 	&& chown -R asterisk. /var/lib/asterisk \
 	&& chown -R asterisk. /var/log/asterisk \
 	&& chown -R asterisk. /var/spool/asterisk \
 	&& chown -R asterisk. /usr/lib64/asterisk \
-	&& chown -R asterisk. /var/www/
-
-RUN chown -R asterisk. /etc/asterisk \
+	&& chown -R asterisk. /var/www/ \
+    && chown -R asterisk. /etc/asterisk \
 	&& chmod 775 /etc/asterisk/cdr_adaptive_odbc.conf
 
 # Fixes issue with running systemD inside docker builds
@@ -61,6 +56,7 @@ RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
 # Install FreePBX
+# Install Webmin repositorie and Webmin
 RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && systemctl start mariadb \
 	&& systemctl start httpd \
@@ -79,10 +75,8 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd freepbx \
     && ./start_asterisk start \
     && ./install -n \
-    && rm -rf /usr/src/freepbx
-
-# Install Webmin repositorie and Webmin
-RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
+    && rm -rf /usr/src/freepbx \
+    && wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN systemctl stop firewalld \
