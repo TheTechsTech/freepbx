@@ -3,7 +3,7 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum install https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/l/libresample-0.1.3-33.el7.x86_64.rpm -y \
+RUN yum install http://www6.atomicorp.com/channels/atomic/centos/7/x86_64/RPMS/libresample-0.1.3-21.el7.art.x86_64.rpm -y \
     && yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
     && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
 
@@ -38,7 +38,7 @@ RUN yum update -y \
     && yum install lame jansson pjproject iksemel -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
-    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample  --skip-broken -y \
+    && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample --skip-broken -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y
 
 # Copy configs and set Asterisk ownership permissions
