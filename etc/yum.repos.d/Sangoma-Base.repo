@@ -5,6 +5,7 @@ name=Sangoma-$releasever - Base
 mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=os&dist=$dist&staging=$staging
 #baseurl=http://package1.sangoma.net/os/$releasever/os/x86_64/
 gpgcheck=0
+enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Sangoma-7
 
 [sng-updates]
@@ -12,6 +13,7 @@ name=Sangoma-$releasever - Updates
 mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=updates&dist=$dist&staging=$staging
 #baseurl=http://package1.sangoma.net/os/$releasever/updates/x86_64/
 gpgcheck=0
+enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Sangoma-7
 
 [sng-extras]
@@ -19,6 +21,7 @@ name=Sangoma-$releasever - Extras
 mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=extras&dist=$dist&staging=$staging
 #baseurl=http://package1.sangoma.net/os/$releasever/extras/x86_64/
 gpgcheck=0
+enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Sangoma-7
 
 [sng-pkgs]
@@ -26,6 +29,7 @@ name=Sangoma-$releasever - Sangoma Open Source Packages
 mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=sng7&dist=$dist&staging=$staging
 #baseurl=http://package1.sangoma.net/sng7/sng7
 gpgcheck=0
+enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Sangoma-7
 
 [sng-epel]
@@ -33,5 +37,5 @@ name=Sangoma-$releasever - Sangoma Epel mirror
 mirrorlist=http://mirrorlist.sangoma.net/?release=$releasever&arch=$basearch&repo=epel&dist=$dist&staging=$staging
 #baseurl=http://package1.sangoma.net/sng7/epel
 gpgcheck=0
+enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-
