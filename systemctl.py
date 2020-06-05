@@ -1,8 +1,10 @@
 #! /usr/bin/python
+## the systemctl*.py files are identical but for the default interpreter
+
 from __future__ import print_function
 
-__copyright__ = "(C) 2016-2019 Guido U. Draheim, licensed under the EUPL"
-__version__ = "1.4.3207"
+__copyright__ = "(C) 2016-2020 Guido U. Draheim, licensed under the EUPL"
+__version__ = "1.4.4181"
 
 import logging
 logg = logging.getLogger("systemctl")
@@ -90,6 +92,7 @@ DefaultPath = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ResetLocale = ["LANG", "LANGUAGE", "LC_CTYPE", "LC_NUMERIC", "LC_TIME", "LC_COLLATE", "LC_MONETARY",
                "LC_MESSAGES", "LC_PAPER", "LC_NAME", "LC_ADDRESS", "LC_TELEPHONE", "LC_MEASUREMENT",
                "LC_IDENTIFICATION", "LC_ALL"]
+LocaleConf="/etc/locale.conf"
 
 # The systemd default is NOTIFY_SOCKET="/var/run/systemd/notify"
 _notify_socket_folder = "/var/run/systemd" # alias /run/systemd
@@ -177,7 +180,7 @@ def _var_path(path):
     return path
 
 
-def shutil_setuid(user = None, group = None):
+def shutil_setuid(user = None, group = None, xgroups = None):
     """ set fork-child uid/gid (returns pw-info env-settings)"""
     if group:
         import grp
@@ -186,11 +189,18 @@ def shutil_setuid(user = None, group = None):
         logg.debug("setgid %s '%s'", gid, group)
     if user:
         import pwd
+        import grp
         pw = pwd.getpwnam(user)
+        gid = pw.pw_gid
+        gname = grp.getgrgid(gid).gr_name
         if not group:
-            gid = pw.pw_gid
             os.setgid(gid)
             logg.debug("setgid %s", gid)
+        groups = [g.gr_gid for g in grp.getgrall() if user in g.gr_mem]
+        if xgroups:
+            groups += [g.gr_gid for g in grp.getgrall() if g.gr_name in xgroups and g.gr_gid not in groups]
+        if groups:
+            os.setgroups(groups)
         uid = pw.pw_uid
         os.setuid(uid)
         logg.debug("setuid %s '%s'", uid, user)
@@ -939,7 +949,7 @@ class Systemctl:
             logg.debug("%s is /user/ conf >> accept", conf.filename())
             return False
         # to allow for 'docker run -u user' with system services
-        user = self.expand_special(conf.get("Service", "User", ""), conf)
+        user = self.get_User(conf)
         if user and user == self.user():
             logg.debug("%s with User=%s >> accept", conf.filename(), user)
             return False
@@ -966,7 +976,7 @@ class Systemctl:
         return result
     def load_sysd_template_conf(self, module): # -> conf?
         """ read the unit template with a UnitConfParser (systemd) """
-        if "@" in module:
+        if module and "@" in module:
             unit = parse_unit(module)
             service = "%s@.service" % unit.prefix
             return self.load_sysd_unit_conf(service)
@@ -1028,7 +1038,7 @@ class Systemctl:
         data = UnitConfParser()
         data.set("Unit","Id", module)
         data.set("Unit", "Names", module)
-        data.set("Unit", "Description", description or ("NOT-FOUND "+module))
+        data.set("Unit", "Description", description or ("NOT-FOUND " + str(module)))
         # assert(not data.loaded())
         conf = SystemctlConf(data, module)
         conf._root = self._root
@@ -1801,7 +1811,7 @@ class Systemctl:
         returncode = 0
         service_result = "success"
         if True:
-            if runs in [ "simple", "forking", "notify" ]:
+            if runs in [ "simple", "forking", "notify", "idle" ]:
                 env["MAINPID"] = str(self.read_mainpid_from(conf, ""))
             for cmd in conf.getlist("Service", "ExecStartPre", []):
                 check, cmd = checkstatus(cmd)
@@ -1863,7 +1873,7 @@ class Systemctl:
                 self.set_status_from(conf, "ExecMainCode", returncode)
                 active = returncode and "failed" or "active"
                 self.write_status_from(conf, AS=active)
-        elif runs in [ "simple" ]:
+        elif runs in [ "simple", "idle" ]:
             status_file = self.status_file_from(conf)
             pid = self.read_mainpid_from(conf, "")
             if self.is_active_pid(pid):
@@ -2035,12 +2045,29 @@ class Systemctl:
             if name in env:
                 del env[name]
         locale = {}
-        for var, val in self.read_env_file("/etc/locale.conf"):
-            locale[var] = val
-            env[var] = val
+        path = env.get("LOCALE_CONF", LocaleConf)
+        parts = path.split(os.pathsep)
+        for part in parts:
+            if os.path.isfile(part):
+                for var, val in self.read_env_file("-"+part):
+                    locale[var] = val
+                    env[var] = val
         if "LANG" not in locale:
             env["LANG"] = locale.get("LANGUAGE", locale.get("LC_CTYPE", "C"))
         return env
+    def expand_list(self, group_lines, conf):
+        result = []
+        for line in group_lines:
+            for item in line.split():
+                if item:
+                    result.append(self.expand_special(item, conf))
+        return result
+    def get_User(self, conf):
+        return self.expand_special(conf.get("Service", "User", ""), conf)
+    def get_Group(self, conf):
+        return self.expand_special(conf.get("Service", "Group", ""), conf)
+    def get_SupplementaryGroups(self, conf):
+        return self.expand_list(conf.getlist("Service", "SupplementaryGroups", []), conf)
     def execve_from(self, conf, cmd, env):
         """ this code is commonly run in a child process // returns exit-code"""
         runs = conf.get("Service", "Type", "simple").lower()
@@ -2050,9 +2077,10 @@ class Systemctl:
         os.dup2(inp.fileno(), sys.stdin.fileno())
         os.dup2(out.fileno(), sys.stdout.fileno())
         os.dup2(out.fileno(), sys.stderr.fileno())
-        runuser = self.expand_special(conf.get("Service", "User", ""), conf)
-        rungroup = self.expand_special(conf.get("Service", "Group", ""), conf)
-        envs = shutil_setuid(runuser, rungroup)
+        runuser = self.get_User(conf)
+        rungroup = self.get_Group(conf)
+        xgroups = self.get_SupplementaryGroups(conf)
+        envs = shutil_setuid(runuser, rungroup, xgroups)
         badpath = self.chdir_workingdir(conf) # some dirs need setuid before
         if badpath:
             logg.error("(%s): bad workingdir: '%s'", shell_cmd(cmd), badpath)
@@ -2174,7 +2202,7 @@ class Systemctl:
                 self.do_kill_unit_from(conf)
                 self.clean_pid_file_from(conf)
                 self.clean_status_from(conf) # "inactive"
-        elif runs in [ "simple", "notify" ]:
+        elif runs in [ "simple", "notify", "idle" ]:
             status_file = self.status_file_from(conf)
             size = os.path.exists(status_file) and os.path.getsize(status_file)
             logg.info("STATUS %s %s", status_file, size)
@@ -2333,7 +2361,7 @@ class Systemctl:
                 else:
                     self.write_status_from(conf, AS="active")
                     return True
-        elif runs in [ "simple", "notify", "forking" ]:
+        elif runs in [ "simple", "notify", "forking", "idle" ]:
             if not self.is_active_from(conf):
                 logg.info("no reload on inactive service %s", conf.name())
                 return True
@@ -2703,7 +2731,8 @@ class Systemctl:
         if not conf.loaded():
             logg.warning("Unit %s could not be found.", unit)
             return "unknown"
-        return self.get_active_from(conf)
+        else:
+            return self.get_active_from(conf)
     def get_active_from(self, conf):
         """ returns 'active' 'inactive' 'failed' 'unknown' """
         # used in try-restart/other commands to check if needed.
@@ -3593,7 +3622,7 @@ class Systemctl:
                 logg.error(" %s: Executable path is not absolute, ignoring: %s", unit, line.strip())
                 errors += 1
             usedExecReload.append(line)
-        if haveType in ["simple", "notify", "forking"]:
+        if haveType in ["simple", "notify", "forking", "idle"]:
             if not usedExecStart and not usedExecStop:
                 logg.error(" %s: Service lacks both ExecStart and ExecStop= setting. Refusing.", unit)
                 errors += 101
@@ -3748,8 +3777,12 @@ class Systemctl:
         yield "ActiveState", self.get_active_from(conf)     # status["ActiveState"]
         yield "LoadState", loaded
         yield "UnitFileState", self.enabled_from(conf)
+        yield "User", self.get_User(conf) or ""
+        yield "Group", self.get_Group(conf) or ""
+        yield "SupplementaryGroups", " ".join(self.get_SupplementaryGroups(conf))
         yield "TimeoutStartUSec", seconds_to_time(self.get_TimeoutStartSec(conf))
         yield "TimeoutStopUSec", seconds_to_time(self.get_TimeoutStopSec(conf))
+        yield "NeedDaemonReload", "no"
         env_parts = []
         for env_part in conf.getlist("Service", "Environment", []):
             env_parts.append(self.expand_special(env_part, conf))
@@ -4408,7 +4441,7 @@ if __name__ == "__main__":
     #    help="Enable/disable unit files globally") # for all user logins
     # _o.add_option("--runtime", action="store_true",
     #     help="Enable unit files only temporarily until next reboot")
-    _o.add_option("--force", action="store_true", default=_force,
+    _o.add_option("-f", "--force", action="store_true", default=_force,
         help="When enabling unit files, override existing symblinks / When shutting down, execute action immediately")
     _o.add_option("--preset-mode", metavar="TYPE", default=_preset_mode,
         help="Apply only enable, only disable, or all presets [%default]")
@@ -4501,6 +4534,10 @@ if __name__ == "__main__":
     logg.debug("======= systemctl.py " + " ".join(args))
     command = args[0]
     modules = args[1:]
+    try:
+        modules.remove("service")
+    except ValueError:
+        pass
     if opt.ipv4:
         systemctl.force_ipv4()
     elif opt.ipv6:
