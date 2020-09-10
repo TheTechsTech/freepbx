@@ -2,13 +2,13 @@
 #ACTION SOURCE  DEST    PROTO   DPORT   SPORT   ORIGDEST    RATE    USER    MARK    CONNLIMIT   TIME    HEADERS SWITCH  HELPER
 # Permit all ICMP traffic FROM the firewall TO the net zone
 #Allow incoming TCP ports
-ACCEPT	net	$FW	tcp	25,80,443,465,2122,5060,5061,8001,8003,8088,8089,9000,10000:10100
+ACCEPT	net	$FW	tcp	25,80,443,465,2122,5060,5061,5062,5063,8001,8003,8088,8089,9000,10000:10100
 ACCEPT net $FW icmp 8 - - 1/sec
 ACCEPT net $FW icmp 0 - - 1/sec
 ACCEPT net $FW icmp 11
 ACCEPT net $FW icmp 3
 #Allow incoming UDP ports
-ACCEPT	net	$FW	udp	500,4500,5060,5061,9000,10000:10100
+ACCEPT	net	$FW	udp	500,4500,5060,5061,5062,5063,9000,10000:10100
 #ssh on port 2122
 DROP:info:TRAP net $FW tcp   22
 #Commonly blocked ports

@@ -13,7 +13,9 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois mpg123 ffmpeg at \
+    && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
+    && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
 
 # Install Shorewall and the fail2ban action
 # Install php 5.6 repositories and php5.6w
@@ -56,7 +58,6 @@ RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
 # Install FreePBX
-# Install Webmin repositorie and Webmin
 RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && systemctl start mariadb \
 	&& systemctl start httpd \
@@ -75,10 +76,20 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd freepbx \
     && ./start_asterisk start \
     && ./install -n \
+    && fwconsole ma downloadinstall ttsengines \
+    && fwconsole ma downloadinstall ucp \
+    && fwconsole ma downloadinstall filestore \
+    && fwconsole ma downloadinstall backup \
+    && fwconsole ma downloadinstall arimanager \
+    && fwconsole ma downloadinstall asteriskinfo \
+    && fwconsole ma upgradeall \
+    && fwconsole reload \
     && rm -rf /usr/src/freepbx
 
+# Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
+    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc \
+    && yum install -y php-digium_register
 
 RUN systemctl stop firewalld \
     && systemctl.original disable dbus firewalld \
@@ -116,6 +127,6 @@ ENV SSHPORT 2122
 ENV WEBMINPORT 9990
 ENV INTERFACE eth0
 
-EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
+EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 5062/tcp 5062/udp 5063/tcp 5063/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
 
 ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
