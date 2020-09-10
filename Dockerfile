@@ -76,14 +76,6 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd freepbx \
     && ./start_asterisk start \
     && ./install -n \
-    && fwconsole ma downloadinstall ttsengines \
-    && fwconsole ma downloadinstall ucp \
-    && fwconsole ma downloadinstall filestore \
-    && fwconsole ma downloadinstall backup \
-    && fwconsole ma downloadinstall arimanager \
-    && fwconsole ma downloadinstall asteriskinfo \
-    && fwconsole ma upgradeall \
-    && fwconsole reload \
     && rm -rf /usr/src/freepbx
 
 # Install Webmin repositorie and Webmin
