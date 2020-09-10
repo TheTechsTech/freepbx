@@ -13,7 +13,7 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois mpg123 ffmpeg at \
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois at \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
     && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
 
@@ -35,7 +35,7 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum install lame jansson pjproject iksemel -y
+    && yum install lame jansson pjproject iksemel mpg123 ffmpeg -y
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
