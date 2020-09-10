@@ -1,0 +1,71 @@
+#!/bin/sh
+# Startup script for iaxmodem
+#
+# chkconfig: 2345 95 05
+# description: IAXModem for asterisk <-> Hylafax gateway
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+[ -f /usr/sbin/iaxmodem ] || exit 0
+
+prog="IAXmodem"
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon /usr/sbin/iaxmodem
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+stop() {
+    if test "x`pidof iaxmodem`" != x; then
+        echo -n $"Stopping $prog: "
+        killproc iaxmodem
+        echo
+    fi
+    RETVAL=$?
+    return $RETVAL
+}
+
+reload() {
+   if test "x`pidof iaxmodem`" != x; then
+      echo $"Reloading $prog"
+      kill -HUP `head -1 /var/run/iaxmodem.pid`
+   fi
+}
+
+case "$1" in
+        start)
+            start
+            ;;
+
+        stop)
+            stop
+            ;;
+
+        status)
+            status iaxmodem
+            ;;
+        reload)
+            reload
+            ;;
+        restart)
+            stop
+            start
+            ;;
+        condrestart)
+            if test "x`pidof iaxmodem`" != x; then
+                stop
+                start
+            fi
+            ;;
+
+        *)
+            echo $"Usage: $0 {start|stop|reload|restart|condrestart|status}"
+            exit 1
+
+esac
+
+exit $RETVAL
