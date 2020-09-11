@@ -13,9 +13,9 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois at \
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
-    && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
+    && yum -y install at perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
 
 # Install Shorewall and the fail2ban action
 # Install php 5.6 repositories and php5.6w
@@ -72,7 +72,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && chown -R asterisk:asterisk /var/www/html/admin/modules/pm2 \
     && chown -R asterisk:asterisk /var/www/html/admin/modules/ucp \
     && cd /usr/src \
-    && wget -q http://mirror.freepbx.org/modules/packages/freepbx/freepbx-15.0-latest.tgz \
+    && wget -q https://mirror.freepbx.org/modules/packages/freepbx/freepbx-15.0-latest.tgz \
     && tar xfz freepbx-15.0-latest.tgz \
     && rm -f freepbx-15.0-latest.tgz \
     && cd freepbx \
@@ -82,8 +82,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
-    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc \
-    && yum install -y php-digium_register
+    && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN systemctl stop firewalld \
     && systemctl.original disable dbus firewalld \
@@ -107,6 +106,8 @@ RUN chmod 777 /tftpboot \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
+    && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d \
+    && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d \
 	&& systemctl.original disable sendmail.service \
 	&& systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
     && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
