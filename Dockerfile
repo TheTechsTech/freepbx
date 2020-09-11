@@ -35,7 +35,9 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum install lame jansson pjproject iksemel mpg123 ffmpeg -y
+    && yum -y install lame jansson pjproject iksemel mpg123 ffmpeg \
+    && yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
+    && yum -y install libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld
 
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
