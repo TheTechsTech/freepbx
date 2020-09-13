@@ -96,8 +96,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && fwconsole ma downloadinstall backup \
     && fwconsole ma downloadinstall arimanager \
     && fwconsole ma downloadinstall asteriskinfo \
-    && fwconsole ma upgradeall \
-    && fwconsole reload
+    && fwconsole ma upgradeall
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
