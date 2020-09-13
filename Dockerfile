@@ -13,9 +13,9 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois \
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois at \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
-    && yum -y install at perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
+    && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
 
 # Install Shorewall and the fail2ban action
 # Install php 5.6 repositories and php5.6w
@@ -30,26 +30,27 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
-# Install Asterisk, Add Asterisk user, Download extra sounds
 # Copy configs and set Asterisk ownership permissions
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum -y install lame jansson pjproject iksemel mpg123 ffmpeg \
+    && yum -y install lame jansson pjproject \
+    && yum -y install https://repo.zabbix.com/non-supported/rhel/7/x86_64/iksemel-1.4-2.el7.centos.x86_64.rpm \
     && yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
-    && yum -y install libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld
+    && yum -y install mpg123 ffmpeg libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld
 
+# Install Asterisk, Add Asterisk user, Download extra sounds
 RUN adduser asterisk -m -c "Asterisk User" \
     && yum install asterisk16 asterisk16-flite asterisk16-doc asterisk16-voicemail asterisk16-configs asterisk16-odbc asterisk16-resample -y \
     && yum install asterisk-sounds-core-* asterisk-sounds-extra-* asterisk-sounds-moh-* -y \
     && chown asterisk. /var/run/asterisk \
-	&& chown -R asterisk. /var/lib/asterisk \
-	&& chown -R asterisk. /var/log/asterisk \
-	&& chown -R asterisk. /var/spool/asterisk \
-	&& chown -R asterisk. /usr/lib64/asterisk \
-	&& chown -R asterisk. /var/www/ \
+    && chown -R asterisk. /var/lib/asterisk \
+    && chown -R asterisk. /var/log/asterisk \
+    && chown -R asterisk. /var/spool/asterisk \
+    && chown -R asterisk. /usr/lib64/asterisk \
+    && chown -R asterisk. /var/www/ \
     && chown -R asterisk. /etc/asterisk \
-	&& chmod 775 /etc/asterisk/cdr_adaptive_odbc.conf
+    && chmod 775 /etc/asterisk/cdr_adaptive_odbc.conf
 
 # Fixes issue with running systemD inside docker builds
 # From https://github.com/gdraheim/docker-systemctl-replacement
@@ -59,13 +60,23 @@ RUN cp -f /usr/bin/systemctl /usr/bin/systemctl.original \
     && chmod +x /usr/bin/systemctl.py \
     && cp -f /usr/bin/systemctl.py /usr/bin/systemctl
 
+RUN systemctl stop firewalld \
+    && systemctl disable dbus firewalld \
+    && (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
+    systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /lib/systemd/system/multi-user.target.wants/*; \
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*; \
+    rm -f /lib/systemd/system/anaconda.target.wants/*; \
+    rm -f /etc/dbus-1/system.d/*; \
+    rm -f /etc/systemd/system/sockets.target.wants/*;
+
 # Install FreePBX
 RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && systemctl start mariadb \
-	&& systemctl start httpd \
-    && systemctl start asterisk \
-    && systemctl stop asterisk \
-	&& mkdir -p /var/www/html/admin/modules/pm2/node/logs \
+    && mkdir -p /var/www/html/admin/modules/pm2/node/logs \
     && mkdir -p /var/www/html/admin/modules/ucp/node/logs \
     && chmod -R 775 /var/www/html/admin/modules/pm2/node \
     && chmod -R 775 /var/www/html/admin/modules/ucp/node \
@@ -78,24 +89,19 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && cd freepbx \
     && ./start_asterisk start \
     && ./install -n \
-    && rm -rf /usr/src/freepbx
+    && rm -rf /usr/src/freepbx \
+    && fwconsole ma downloadinstall ttsengines \
+    && fwconsole ma downloadinstall ucp \
+    && fwconsole ma downloadinstall filestore \
+    && fwconsole ma downloadinstall backup \
+    && fwconsole ma downloadinstall arimanager \
+    && fwconsole ma downloadinstall asteriskinfo \
+    && fwconsole ma upgradeall \
+    && fwconsole reload
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
-
-RUN systemctl stop firewalld \
-    && systemctl.original disable dbus firewalld \
-    && (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
-    systemd-tmpfiles-setup.service ] || rm -f $i; done); \
-    rm -f /lib/systemd/system/multi-user.target.wants/*; \
-    rm -f /lib/systemd/system/local-fs.target.wants/*; \
-    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-    rm -f /lib/systemd/system/basic.target.wants/*; \
-    rm -f /lib/systemd/system/anaconda.target.wants/*; \
-    rm -f /etc/dbus-1/system.d/*; \
-    rm -f /etc/systemd/system/sockets.target.wants/*;
 
 RUN chmod 777 /tftpboot \
     && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
@@ -108,8 +114,8 @@ RUN chmod 777 /tftpboot \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
     && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d \
     && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d \
-	&& systemctl.original disable sendmail.service \
-	&& systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
+    && systemctl.original disable sendmail.service \
+    && systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
     && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
