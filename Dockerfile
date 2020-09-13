@@ -111,8 +111,8 @@ RUN chmod 777 /tftpboot \
     && sed -i "s#DOCKER=No#DOCKER=Yes#" /etc/shorewall/shorewall.conf \
     && sed -i "s#docker0#eth0#" /etc/shorewall/interfaces \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
-    && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d \
-    && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d \
+    && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d/ssl.conf \
+    && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d/ssl.conf \
     && systemctl.original disable sendmail.service \
     && systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
     && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
