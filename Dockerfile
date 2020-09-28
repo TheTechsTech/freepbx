@@ -34,7 +34,8 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum -y install lame jansson iksemel pjproject \
+    && yum -y install lame jansson pjproject \
+    && yum -y install https://repo.zabbix.com/non-supported/rhel/7/x86_64/iksemel-1.4-2.el7.centos.x86_64.rpm \
     && yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
     && yum -y install mpg123 ffmpeg libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld netpbm libungif ghostscript-fonts sharutils expect \
     && pear channel-update pear.php.net \
