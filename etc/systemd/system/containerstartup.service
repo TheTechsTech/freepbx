@@ -1,6 +1,6 @@
 [Unit]
 Description=Check docker's 'ENV' on container startup
-After=iptables.service, denyhosts.service, shorewall.service, fail2ban.service, mariadb.service, asterisk.service, httpd.service, sendmail.service, freepbx.service, crond.service, rsyslog.service, webmin.service
+After=iptables.service, denyhosts.service, shorewall.service, fail2ban.service, mariadb.service, asterisk.service, httpd.service, postfix.service, freepbx.service, crond.service, rsyslog.service, iaxmodem.service, webmin.service
 
 [Service]
 Type=oneshot

@@ -11,9 +11,9 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
-    sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx \
+    sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx postfix \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
-    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools gnutls gnutls-devel perl-devel whois at \
+    uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools bind bind-utils gnutls gnutls-devel perl-devel whois at \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
     && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
 
@@ -25,7 +25,7 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall-init-5.1.9-0base.noarch.rpm -y \
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y \
-    && yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip \
+    && yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip php56w-devel php-pecl-Fileinfo ImageMagick-devel perl-CGI php-pear-Net-Socket php-pear-Auth-SASL \
     && curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install -y nodejs
 
 # Asterisk and FreePBX Repositorie
@@ -34,10 +34,11 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum -y install lame jansson pjproject \
-    && yum -y install https://repo.zabbix.com/non-supported/rhel/7/x86_64/iksemel-1.4-2.el7.centos.x86_64.rpm \
+    && yum -y install lame jansson iksemel pjproject \
     && yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
-    && yum -y install mpg123 ffmpeg libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld
+    && yum -y install mpg123 ffmpeg libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld netpbm libungif ghostscript-fonts sharutils expect \
+    && pear channel-update pear.php.net \
+    && pear install Mail Net_SMTP Mail_mime MDB2_driver_mysql
 
 # Install Asterisk, Add Asterisk user, Download extra sounds
 RUN adduser asterisk -m -c "Asterisk User" \
@@ -92,18 +93,58 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && rm -rf /usr/src/freepbx \
     && fwconsole ma downloadinstall ttsengines \
     && fwconsole ma downloadinstall ucp \
+    && fwconsole ma downloadinstall ivr \
     && fwconsole ma downloadinstall filestore \
     && fwconsole ma downloadinstall backup \
     && fwconsole ma downloadinstall arimanager \
     && fwconsole ma downloadinstall asteriskinfo \
-    && fwconsole ma upgradeall
+    && fwconsole ma upgradeall \
+    && yum -y install http://repo.firewall-services.com/centos/7/x86_64/iaxmodem-1.3.0-1.el7.fws.x86_64.rpm \
+    && touch /etc/logrotate.d/iaxmodem \
+    && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
+    && chmod +x /etc/rc.d/init.d/iaxmodem \
+    && yum -y install hylafax* \
+    && wget https://jaist.dl.sourceforge.net/project/avantfax/avantfax-3.3.7.tgz \
+    && tar -xvzf avantfax-3.3.7.tgz \
+    && rm -f avantfax-3.3.7.tgz \
+    && cd avantfax-3.3.7 \
+    && mv avantfax /var/www/html/ \
+    && chown -R asterisk.asterisk /var/www/html/avantfax \
+    && chmod -R 0770 /var/www/html/avantfax/tmp /var/www/html/avantfax/faxes \
+    && chown -R asterisk.uucp /var/www/html/avantfax/tmp /var/www/html/avantfax/faxes \
+    && ln -s /var/www/html/avantfax/includes/faxrcvd.php /var/spool/hylafax/bin/faxrcvd.php \
+    && ln -s /var/www/html/avantfax/includes/dynconf.php /var/spool/hylafax/bin/dynconf.php \
+    && ln -s /var/www/html/avantfax/includes/notify.php /var/spool/hylafax/bin/notify.php \
+    && mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('CLEARTEXT_PASSWORD')" \
+    && mysql -uroot -pCLEARTEXT_PASSWORD < create_user.sql \
+    && mysql -uavantfax -pd58fe49 avantfax < create_tables.sql \
+    && mv -f /etc/root/avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
+    && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
+    && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
+    && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
+    && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
+    && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
+    && chown asterisk:asterisk /etc/asterisk/iax_registrations_custom.conf \
+    && cd /var/www/html/admin/modules \
+    && git clone https://github.com/Point808/FreePBX-AvantFAX avantfax \
+    && chown -R asterisk:asterisk avantfax \
+    && fwconsole ma install avantfax \
+    && touch /var/www/html/admin/modules/avantfax/module.sig \
+    && chmod 775 /var/www/html/admin/modules/avantfax/module.sig \
+    && chown asterisk:asterisk /var/www/html/admin/modules/avantfax/module.sig \
+    && rm -rf /root/avantfax-3.3.7 \
+    && rm -rf /etc/root \
+    && fwconsole reload
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
     && yum install webmin yum-versionlock -y && yum versionlock systemd && rm jcameron-key.asc
 
 RUN chmod 777 /tftpboot \
-    && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log \
+    && chmod 6711 /usr/bin/procmail \
+    && chown root:root /usr/bin/procmail \
+    && chown -R postfix:postdrop /var/spool/postfix \
+    && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log /etc/postfix/dependent.db \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
     && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
     && sed -i "s#9000,#9990,#" /etc/shorewall/rules \
@@ -114,7 +155,7 @@ RUN chmod 777 /tftpboot \
     && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d/ssl.conf \
     && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d/ssl.conf \
     && systemctl.original disable sendmail.service \
-    && systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service webmin.service containerstartup.service \
+    && systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service postfix.service iaxmodem.service hylafax-hfaxd.service hylafax-faxq.service named.service webmin.service containerstartup.service \
     && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
@@ -127,6 +168,6 @@ ENV SSHPORT 2122
 ENV WEBMINPORT 9990
 ENV INTERFACE eth0
 
-EXPOSE 25 80 443 465 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 5062/tcp 5062/udp 5063/tcp 5063/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
+EXPOSE 25 53/udp 80 443 465 953 2122 5060/tcp 5060/udp 5061/tcp 5061/udp 5062/tcp 5062/udp 5063/tcp 5063/udp 8001 8003 8088 8089 9990/tcp 9990/udp 10000-10100/tcp 10000-10100/udp
 
 ENTRYPOINT ["/usr/bin/systemctl","default","--init"]

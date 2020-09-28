@@ -180,7 +180,7 @@ action_cf_mwl = cloudflare[cfuser="%(cfemail)s", cftoken="%(cfapikey)s"]
                 %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s"]
 
 # Report block via blocklist.de fail2ban reporting service API
-# 
+#
 # See the IMPORTANT note in action.d/blocklist_de.conf for when to
 # use this action. Create a file jail.d/blocklist_de.local containing
 # [Init]
@@ -554,19 +554,16 @@ logpath  = %(vsftpd_log)s
 
 # ASSP SMTP Proxy Jail
 [assp]
-
 port     = smtp,465,submission
 logpath  = /root/path/to/assp/logs/maillog.txt
 
 
 [courier-smtp]
-
 port     = smtp,465,submission
 logpath  = %(syslog_mail)s
 
 
 [postfix]
-
 port     = smtp,465,submission
 logpath = /var/log/maillog
 enabled = true
@@ -576,18 +573,7 @@ maxretry = 2
 bantime = -1
 
 
-[postfix-rbl]
-
-port     = smtp,465,submission
-logpath = /var/log/maillog
-maxretry = 1
-enabled = true
-filter = postfix-rbl
-action = %(banaction)s[name=postfix-rbl, protocol=tcp]
-
-
 [sendmail-auth]
-
 port    = submission,465,smtp
 logpath = /var/log/maillog
 enabled = true
@@ -596,7 +582,6 @@ action = %(banaction)s[name=sendmail-auth, protocol=tcp]
 
 
 [sendmail-reject]
-
 port     = smtp,465,submission
 logpath = /var/log/maillog
 enabled = true
@@ -605,7 +590,6 @@ action = %(banaction)s[name=sendmail-reject, protocol=tcp]
 
 
 [qmail-rbl]
-
 filter  = qmail
 port    = smtp,465,submission
 logpath = /service/qmail/log/main/current
@@ -614,7 +598,6 @@ logpath = /service/qmail/log/main/current
 # dovecot defaults to logging to the mail syslog facility
 # but can be set by syslog_facility in the dovecot configuration.
 [dovecot]
-
 port    = pop3,pop3s,imap,imaps,submission,465,sieve
 logpath = /var/log/maillog
 enabled = true
@@ -625,31 +608,26 @@ bantime = -1
 
 
 [sieve]
-
 port   = smtp,465,submission
 logpath = %(dovecot_log)s
 
 
 [solid-pop3d]
-
 port    = pop3,pop3s
 logpath = %(solidpop3d_log)s
 
 
 [exim]
-
 port   = smtp,465,submission
 logpath = %(exim_main_log)s
 
 
 [exim-spam]
-
 port   = smtp,465,submission
 logpath = %(exim_main_log)s
 
 
 [kerio]
-
 port    = imap,smtp,imaps,465
 logpath = /opt/kerio/mailserver/store/logs/security.log
 
@@ -665,40 +643,17 @@ port     = smtp,465,submission,imap3,imaps,pop3,pop3s
 logpath  = %(syslog_mail)s
 
 
-[postfix-sasl]
-
-port     = smtp,465,submission,imap3,imaps,pop3,pop3s
-# You might consider monitoring /var/log/mail.warn instead if you are
-# running postfix since it would provide the same log lines at the
-# "warn" level but overall at the smaller filesize.
-logpath = /var/log/maillog
-enabled = true
-filter = postfix-sasl
-action = %(banaction)s[]
-bantime = -1
-maxretry = 3
-
-
-[perdition]
-
-port   = imap3,imaps,pop3,pop3s
-logpath = %(syslog_mail)s
-
-
 [squirrelmail]
-
 port = smtp,465,submission,imap2,imap3,imaps,pop3,pop3s,http,https,socks
 logpath = /var/lib/squirrelmail/prefs/squirrelmail_access_log
 
 
 [cyrus-imap]
-
 port   = imap3,imaps
 logpath = %(syslog_mail)s
 
 
 [uwimap-auth]
-
 port   = imap3,imaps
 logpath = %(syslog_mail)s
 
@@ -751,7 +706,6 @@ logpath = /var/log/nsd.log
 #
 
 [asterisk]
-
 port     = 5060,5061
 %(banaction)s[name=asterisk-tcp, port=5060, protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
         %(banaction)s[name=asterisk-udp, port=5061, protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
@@ -766,9 +720,7 @@ action = %(banaction)s[name=asterisk-tcp, port=5060, protocol=tcp, chain=%(chain
         %(banaction)s[name=asterisk-udp, port=5061, protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
         %(mta)s-whois[name=asterisk, dest=%(destemail)s]
 
-
 [freeswitch]
-
 port     = 5060,5061
 action = %(banaction)s[protocol=tcp, chain=%(chain)s, actname=%(banaction)s-tcp]
         iptables-multiport[protocol=udp, chain=%(chain)s, actname=%(banaction)s-udp]
@@ -808,7 +760,6 @@ action = %(banaction)s[name=mysqld-auth, port=3306, protocol=tcp]
 # 2. Increase dbpurgeage defined in fail2ban.conf to e.g. 648000 (7.5 days)
 #    to maintain entries for failed logins for sufficient amount of time
 [recidive]
-
 logpath = /var/log/fail2ban.log
 banaction = shorewall
 bantime = -1
@@ -938,25 +889,25 @@ logpath = /etc/httpd/logs/error_log
 #          sendmail-whois[name=fusionpbx, dest=root, sender=fail2ban@example.org] #no smtp server installed
 #maxretry = 10
 
-[ast-cli-attck]                                                                                            
+[ast-cli-attck]
 enabled = true
-filter   = asterisk_cli                                                                                    
+filter   = asterisk_cli
 action = %(banaction)s[name=AST_CLI_Attack, port=5060, protocol=tcp]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
 
-[asterisk-manager]                                                                                         
+[asterisk-manager]
 enabled = true
-filter   = asterisk_manager                                                                                
+filter   = asterisk_manager
 action = %(banaction)s[name=AST_MANAGER, port=5038, protocol=tcp]
 logpath = /var/log/asterisk/full
 maxretry = 1
 bantime = -1
 
-[mor_ddos]                                                                                                 
+[mor_ddos]
 enabled = true
-filter   = mor_ddos                                                                                        
+filter   = mor_ddos
 action = %(banaction)s[name=mor_ddos, port=5060, protocol=tcp]
 logpath = /var/log/httpd/error_log
 bantime = 3600
