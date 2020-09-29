@@ -105,9 +105,8 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
     && chmod +x /etc/rc.d/init.d/iaxmodem \
     && yum -y install hylafax* \
-    && cd /root \
+    && cd /etc/root \
     && tar -xvzf avantfax-3.3.7.tgz \
-    && rm -f avantfax-3.3.7.tgz \
     && cd avantfax-3.3.7 \
     && mv avantfax /var/www/html/ \
     && chown -R asterisk.asterisk /var/www/html/avantfax \
@@ -119,7 +118,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('CLEARTEXT_PASSWORD')" \
     && mysql -uroot -pCLEARTEXT_PASSWORD < create_user.sql \
     && mysql -uavantfax -pd58fe49 avantfax < create_tables.sql \
-    && mv -f /etc/root/avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
+    && cp -f avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
     && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
     && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
@@ -132,7 +131,6 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && touch /var/www/html/admin/modules/avantfax/module.sig \
     && chmod 775 /var/www/html/admin/modules/avantfax/module.sig \
     && chown asterisk:asterisk /var/www/html/admin/modules/avantfax/module.sig \
-    && rm -rf /root/avantfax-3.3.7 \
     && rm -rf /etc/root \
     && fwconsole reload
 
