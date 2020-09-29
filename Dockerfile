@@ -26,7 +26,7 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y \
     && yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip php56w-devel php-pecl-Fileinfo ImageMagick-devel perl-CGI php-pear-Net-Socket php-pear-Auth-SASL \
-    && curl -sL https://rpm.nodesource.com/setup_11.x | bash - && sudo yum install -y nodejs
+    && curl -sL https://rpm.nodesource.com/setup_11.x | bash - && yum install -y nodejs
 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
@@ -134,7 +134,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && chmod 775 /var/www/html/admin/modules/avantfax/module.sig \
     && chown asterisk:asterisk /var/www/html/admin/modules/avantfax/module.sig \
     && rm -rf /etc/root \
-    && fwconsole reload
+    && mysql -uroot -pCLEARTEXT_PASSWORD -e "DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE IF EXISTS test; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'; FLUSH PRIVILEGES;"
 
 # Install Webmin repositorie and Webmin
 RUN wget http://www.webmin.com/jcameron-key.asc -q && rpm --import jcameron-key.asc \
