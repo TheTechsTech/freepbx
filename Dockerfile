@@ -99,7 +99,9 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && fwconsole ma downloadinstall backup \
     && fwconsole ma downloadinstall arimanager \
     && fwconsole ma downloadinstall asteriskinfo \
+    && fwconsole ma downloadinstall pm2 \
     && fwconsole ma upgradeall \
+    && fwconsole ma enable pm2 \
     && yum -y install http://repo.firewall-services.com/centos/7/x86_64/iaxmodem-1.3.0-1.el7.fws.x86_64.rpm \
     && touch /etc/logrotate.d/iaxmodem \
     && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
