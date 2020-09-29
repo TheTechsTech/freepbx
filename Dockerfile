@@ -105,7 +105,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
     && chmod +x /etc/rc.d/init.d/iaxmodem \
     && yum -y install hylafax* \
-    && wget https://jaist.dl.sourceforge.net/project/avantfax/avantfax-3.3.7.tgz \
+    && cd /root \
     && tar -xvzf avantfax-3.3.7.tgz \
     && rm -f avantfax-3.3.7.tgz \
     && cd avantfax-3.3.7 \
@@ -121,7 +121,6 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && mysql -uavantfax -pd58fe49 avantfax < create_tables.sql \
     && mv -f /etc/root/avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
-    && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
     && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
     && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
     && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
