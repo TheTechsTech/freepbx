@@ -26,7 +26,7 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
     && yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shorewall6-5.1.9-0base.noarch.rpm -y \
     && yum install fail2ban-shorewall -y \
     && yum -y install php56w php56w-pdo php56w-mysql php56w-mbstring php56w-pear php56w-process php56w-xml php56w-gd php56w-opcache php56w-ldap php56w-intl php56w-soap php56w-zip php56w-devel php-pecl-Fileinfo ImageMagick-devel perl-CGI php-pear-Net-Socket php-pear-Auth-SASL \
-    && curl -sL https://rpm.nodesource.com/setup_10.x | bash - && sudo yum install -y nodejs
+    && curl -sL https://rpm.nodesource.com/setup_11.x | bash - && sudo yum install -y nodejs
 
 # Asterisk and FreePBX Repositorie
 # Install lame jansson iksemel and pjproject
@@ -101,7 +101,6 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && fwconsole ma downloadinstall asteriskinfo \
     && fwconsole ma downloadinstall pm2 \
     && fwconsole ma upgradeall \
-    && fwconsole ma enable pm2 \
     && yum -y install http://repo.firewall-services.com/centos/7/x86_64/iaxmodem-1.3.0-1.el7.fws.x86_64.rpm \
     && touch /etc/logrotate.d/iaxmodem \
     && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
