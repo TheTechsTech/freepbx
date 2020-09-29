@@ -118,8 +118,9 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('CLEARTEXT_PASSWORD')" \
     && mysql -uroot -pCLEARTEXT_PASSWORD < create_user.sql \
     && mysql -uavantfax -pd58fe49 avantfax < create_tables.sql \
-    && cp -f avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
+    && cp -f /etc/root/avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
+    && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
     && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
     && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
     && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
