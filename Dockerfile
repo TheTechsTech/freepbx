@@ -34,8 +34,7 @@ RUN yum install http://www.shorewall.net/pub/shorewall/5.1/shorewall-5.1.9/shore
 COPY etc /etc/
 
 RUN yum update -y \
-    && yum -y install lame jansson pjproject \
-    && yum -y install https://repo.zabbix.com/non-supported/rhel/7/x86_64/iksemel-1.4-2.el7.centos.x86_64.rpm \
+    && yum -y install lame jansson pjproject iksemel \
     && yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
     && yum -y install mpg123 ffmpeg libde265 x265 libdvdcss gstreamer-plugins-bad-nonfree gstreamer1-plugins-bad-freeworld netpbm libungif ghostscript-fonts sharutils expect \
     && pear channel-update pear.php.net \
@@ -103,7 +102,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && fwconsole ma upgradeall \
     && yum -y install http://repo.firewall-services.com/centos/7/x86_64/iaxmodem-1.3.0-1.el7.fws.x86_64.rpm \
     && touch /etc/logrotate.d/iaxmodem \
-    && echo "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
+    && echo -e "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
     && chmod +x /etc/rc.d/init.d/iaxmodem \
     && yum -y install hylafax* \
     && cd /etc/root \
@@ -119,7 +118,10 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('CLEARTEXT_PASSWORD')" \
     && mysql -uroot -pCLEARTEXT_PASSWORD < create_user.sql \
     && mysql -uavantfax -pd58fe49 avantfax < create_tables.sql \
-    && cp -f /etc/root/avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
+    && cd .. \
+    && cp -f avantfax_config.php /var/www/html/avantfax/includes/local_config.php \
+    && chmod +x avantfax_modems.sh \
+    && ./avantfax_modems.sh \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
     && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
     && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
@@ -145,6 +147,10 @@ RUN chmod 777 /tftpboot \
     && chown root:root /usr/bin/procmail \
     && chown -R postfix:postdrop /var/spool/postfix \
     && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log /etc/postfix/dependent.db \
+    && echo "mailbox_command = /bin/procmail" >>  /etc/postfix/main.cf \
+    && echo -e "fax       unix  -       n       n       -       1       pipe\n  flags= user=faxmail argv=/usr/bin/faxmail -d -n -NT \${user}\n" >> /etc/postfix/master.cf \
+    && echo -e "transport_maps = hash:/etc/postfix/transport\nfax_destination_recipient_limit = 1" >> /etc/postfix/main.cf \
+    && echo -e "AutoCoverPage: false\nTextPointSize: 12pt\nHeaders: Message-id Date Subject From\nMailUser: faxmail\n" >> /etc/hylafax/faxmail.conf \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
     && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
     && sed -i "s#9000,#9990,#" /etc/shorewall/rules \

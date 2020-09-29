@@ -9,6 +9,7 @@ if [ -f "/etc/letsencrypt/archive/$HOSTNAME/cert1.pem" ]
 then
     ln -sf "/etc/letsencrypt/archive/$HOSTNAME/cert1.pem" /etc/pki/tls/certs/localhost.crt
     ln -sf "/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem" /etc/pki/tls/private/localhost.key
+    cat "/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem" "/etc/letsencrypt/archive/$HOSTNAME/cert1.pem" > /etc/webmin/miniserv.pem
 fi
 
 source /etc/container.ini
@@ -67,9 +68,17 @@ then
     sed -i "s#$SHOREWALL#$INTERFACE#" /etc/container.ini
 fi
 
-if ! pgrep -x "sendmail" > /dev/null
+if ! pgrep -x "postfix" > /dev/null
 then
-    service sendmail start
+    service postfix start
+fi
+
+if [ ! -f "/etc/postfix/email_faxing_ready" ]
+then
+	echo -e "$HOSTNAME\tfax:localhost" >> /etc/postfix/transport
+	postmap /etc/postfix/transport
+    service postfix restart
+	touch /etc/postfix/email_faxing_ready
 fi
 
 systemctl restart shorewall
