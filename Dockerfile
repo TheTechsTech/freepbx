@@ -123,6 +123,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && chmod +x avantfax_modems.sh \
     && ./avantfax_modems.sh \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
+    && echo -e "AutoCoverPage: false\nTextPointSize: 12pt\nHeaders: Message-id Date Subject From\nMailUser: faxmail\n" >> /etc/hylafax/faxmail.conf \
     && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
     && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
     && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
@@ -147,10 +148,8 @@ RUN chmod 777 /tftpboot \
     && chown root:root /usr/bin/procmail \
     && chown -R postfix:postdrop /var/spool/postfix \
     && touch /var/log/asterisk/full /var/log/secure /var/log/maillog /var/log/httpd/access_log /etc/httpd/logs/error_log /var/log/fail2ban.log /etc/postfix/dependent.db \
+    && echo "" > /etc/postfix/transport \
     && echo "mailbox_command = /bin/procmail" >>  /etc/postfix/main.cf \
-    && echo -e "fax       unix  -       n       n       -       1       pipe\n  flags= user=faxmail argv=/usr/bin/faxmail -d -n -NT \${user}\n" >> /etc/postfix/master.cf \
-    && echo -e "transport_maps = hash:/etc/postfix/transport\nfax_destination_recipient_limit = 1" >> /etc/postfix/main.cf \
-    && echo -e "AutoCoverPage: false\nTextPointSize: 12pt\nHeaders: Message-id Date Subject From\nMailUser: faxmail\n" >> /etc/hylafax/faxmail.conf \
     && sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config \
     && sed -i "s#10000#9990#" /etc/webmin/miniserv.conf \
     && sed -i "s#9000,#9990,#" /etc/shorewall/rules \

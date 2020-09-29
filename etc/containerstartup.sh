@@ -75,9 +75,12 @@ fi
 
 if [ ! -f "/etc/postfix/email_faxing_ready" ]
 then
+    service postfix stop
 	echo -e "$HOSTNAME\tfax:localhost" >> /etc/postfix/transport
 	postmap /etc/postfix/transport
-    service postfix restart
+    echo -e "fax       unix  -       n       n       -       1       pipe\n  flags= user=faxmail argv=/usr/bin/faxmail -d -n -NT \${user}\n" >> /etc/postfix/master.cf
+    echo -e "transport_maps = hash:/etc/postfix/transport\nfax_destination_recipient_limit = 1" >> /etc/postfix/main.cf
+    service postfix start
 	touch /etc/postfix/email_faxing_ready
 fi
 

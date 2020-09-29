@@ -17,3 +17,8 @@ for i in `ls /var/spool/hylafax/etc/config.*`; do
 		fi
 	fi
 done
+
+if [ -f /etc/mail/trusted-users ]; then
+  grep ^asterisk$ /etc/mail/trusted-users || \
+     echo asterisk >> /etc/mail/trusted-users
+fi
