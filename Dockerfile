@@ -129,7 +129,6 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
     && echo -e "AutoCoverPage: false\nTextPointSize: 12pt\nHeaders: Message-id Date Subject From\nMailUser: faxmail\n" >> /etc/hylafax/faxmail.conf \
     && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
-    && ln -s /usr/share/file/magic* /usr/share/misc/ \
     && cd /var/www/html/admin/modules \
     && git clone https://github.com/Point808/FreePBX-AvantFAX avantfax \
     && chown -R asterisk:asterisk avantfax \
