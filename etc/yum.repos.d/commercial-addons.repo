@@ -1,12 +1,4 @@
 [commercial-addons]
-name=Commercial Addons RPM Repository
-mirrorlist=http://mirror.issabel.org/?release=4&arch=$basearch&repo=commercial_addons
-#baseurl=http://repo.issabel.org/issabel/4/commercial_addons/$basearch/
-gpgcheck=1
-enabled=1
-gpgkey=http://repo.issabel.org/issabel/RPM-GPG-KEY-Issabel
-
-[LowayResearch]
 name=Loway Research Yum Repository
 baseurl=http://yum.loway.ch/RPMS
 gpgcheck=0

@@ -103,6 +103,10 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && yum -y install http://repo.firewall-services.com/centos/7/x86_64/iaxmodem-1.3.0-1.el7.fws.x86_64.rpm \
     && touch /etc/logrotate.d/iaxmodem \
     && echo -e "/var/log/iaxmodem/*.log {\nnotifempty\nmissingok\npostrotate\n/bin/kill -HUP `cat /var/run/iaxmodem.pid` || true\nendscript\n}\n" > /etc/logrotate.d/iaxmodem \
+    && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
+    && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
+    && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
+    && chown asterisk:asterisk /etc/asterisk/iax_registrations_custom.conf \
     && chmod +x /etc/rc.d/init.d/iaxmodem \
     && yum -y install hylafax* \
     && cd /etc/root \
@@ -125,10 +129,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && echo "CoverCmd:		/var/www/html/avantfax/includes/faxcover.php" >> /etc/hylafax/sendfax.conf \
     && echo -e "AutoCoverPage: false\nTextPointSize: 12pt\nHeaders: Message-id Date Subject From\nMailUser: faxmail\n" >> /etc/hylafax/faxmail.conf \
     && printf "# runs once an hour to update the phone book\n0 * * * *\t/var/www/html/avantfax/includes/phb.php\n# runs once a day to remove old files\n0 0 * * *\t/var/www/html/avantfax/includes/avantfaxcron.php -t 2\n" > /etc/cron.d/avantfax \
-    && echo "minregexpire=60" > /etc/asterisk/iax_registrations_custom.conf \
-    && echo "maxregexpire=600" >> /etc/asterisk/iax_registrations_custom.conf \
-    && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
-    && chown asterisk:asterisk /etc/asterisk/iax_registrations_custom.conf \
+    && ln -s /usr/share/file/magic* /usr/share/misc/ \
     && cd /var/www/html/admin/modules \
     && git clone https://github.com/Point808/FreePBX-AvantFAX avantfax \
     && chown -R asterisk:asterisk avantfax \
@@ -137,6 +138,8 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && chmod 775 /var/www/html/admin/modules/avantfax/module.sig \
     && chown asterisk:asterisk /var/www/html/admin/modules/avantfax/module.sig \
     && rm -rf /etc/root \
+    && mysql -uroot -pCLEARTEXT_PASSWORD -e "GRANT ALL PRIVILEGES ON asterisk.* TO freepbxuser@localhost;" \
+    && mysql -uroot -pCLEARTEXT_PASSWORD -e "GRANT ALL PRIVILEGES ON asteriskcdrdb.* TO freepbxuser@localhost;" \
     && mysql -uroot -pCLEARTEXT_PASSWORD -e "DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE IF EXISTS test; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'; FLUSH PRIVILEGES;"
 
 # Install Webmin repositorie and Webmin
@@ -159,9 +162,9 @@ RUN chmod 777 /tftpboot \
     && sed -i 's#, #\nAfter=#' /etc/systemd/system/containerstartup.service \
     && sed -i 's#/etc/pki/tls/private/localhost.key#/etc/webmin/letsencrypt-key.pem#' /etc/httpd/conf.d/ssl.conf \
     && sed -i 's#/etc/pki/tls/certs/localhost.crt#/etc/webmin/letsencrypt-cert.pem#' /etc/httpd/conf.d/ssl.conf \
+    && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && systemctl.original disable sendmail.service \
     && systemctl.original enable iptables.service fail2ban.service shorewall.service mariadb.service asterisk.service httpd.service freepbx.service crond.service rsyslog.service sshd-keygen.service sshd.service postfix.service iaxmodem.service hylafax-hfaxd.service hylafax-faxq.service named.service webmin.service containerstartup.service \
-    && sed -i 's#localhost.key#localhost.key\n\tcat \"/etc/letsencrypt/archive/$HOSTNAME/privkey1.pem\" \"/etc/letsencrypt/archive/$HOSTNAME/cert1.pem\" >/etc/webmin/miniserv.pem#' /etc/containerstartup.sh \
     && chmod +x /etc/containerstartup.sh \
     && mv -f /etc/containerstartup.sh /containerstartup.sh \
     && echo "root:freepbx" | chpasswd
