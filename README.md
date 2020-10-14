@@ -50,7 +50,7 @@ docker run --name freepbx \
 
 Using the Webmin UI visit: `https://ip_or_hostname:9990`
 
-Change root passord from default 'freepbx':
+Change *Linux* root password from default 'freepbx':
 
     "System -> Change Passwords -> root"
 
@@ -70,6 +70,10 @@ Add Let's Encrypt SSL certicate to Apache default:
 * Private key file                `/etc/webmin/letsencrypt-key.pem`
 * Certificate authorities file    `/etc/webmin/letsencrypt-ca.pem`"
 
+Change *MariaDB* database root password from default 'CLEARTEXT_PASSWORD':
+
+    "Servers -> MySQL Database Server -> Change Administration Password"
+
 ## Faxing Setup with Avantfax combining IAXModem/Hylafax
 
 This installation has an menu link pointing to: `https://ip_or_hostname/avantfax`
@@ -81,7 +85,7 @@ This installation has an menu link pointing to: `https://ip_or_hostname/avantfax
 
 **IAXModem** default fax modem configuration:
 
-`nano /etc/iaxmodem/ttyIAX0`
+`vim /etc/iaxmodem/ttyIAX0`
 
 ```bash
 device /dev/ttyIAX0
@@ -97,7 +101,7 @@ cidnumber 9999999999
 codec ulaw
 ```
 
-`nano /etc/asterisk/iax_custom.conf`
+`vim /etc/asterisk/iax_custom.conf`
 
 ```bash
 [19999]
@@ -118,9 +122,12 @@ callerid=Fax System <19999>
 setvar=REALCALLERIDNUM=
 ```
 
-After editing run:
+After editing run **Hylafax**:
 
     faxsetup
+
+Which will also run `faxaddmodem`, use **ttyIAX0**
+for "Serial port of modem".
 
 In FreePBX GUI, add the following Custom Destination:
 
@@ -130,7 +137,56 @@ Incoming fax support requires a dedicated DID, and point the DID to the new Cust
 
 Outbound faxing will go out via the normal trunks as configured.
 
+Before visiting `https://ip_or_hostname/avantfax`, update/change root password to access Avantfax Database to the one that was set using **Webmin** UI `Servers -> MySQL Database Server -> Change Administration Password`.
+
+    vim /var/www/html/avantfax/includes/local_config.php
+
 ## Your now ready to config FreePBX by visiting
 
 * https://host_ip
 * https://host_name
+
+## For better security
+
+Make sure to turn off:
+
+    Allow Anonymous Inbound SIP Calls and Allow SIP Guests
+
+Under `Settings -> Asterisk SIP Settings -> Security Settings`.
+
+----------
+
+## For Free **SIP** *VoIP* service using [Google Voice](http://www.google.com/voice) and [obitalk.com](https://www.obitalk.com) with **Obihai** [devices](https://www.obitalk.com/info/products)
+
+Modified setup configurations from https://cboh.org/voip/obi/OBi_As_ITSP.html
+
+**Add your Google Voice number**
+![trunk](pics/obiatpbx1.jpg)
+![trunk](pics/obiatpbx2.jpg)
+
+**Add your public ip address of your obi ATA device/router**
+
+**Add SIP Credentials that was set on the obi ATA device/router**
+![trunk](pics/obiatpbx3.jpg)
+![trunk](pics/obiatpbx4.jpg)
+![trunk](pics/obiatpbx5.jpg)
+![trunk](pics/obiatpbx6.jpg)
+![trunk](pics/obiatpbx7.jpg)
+
+![Inbound](pics/obiatpbxIn.jpg)
+![Outbound](pics/obiatpbxOut.jpg)
+
+Insure you have all items in red **"!"** are changed/edited to match.
+![obiata](pics/obisetup1.jpg)
+
+**Add your FreePBX Server IP address/URI and create SIP Credentials**
+![obiata](pics/obisetup2.jpg)
+![obiata](pics/obisetup3.jpg)
+![obiata](pics/obisetup4.jpg)
+![obiata](pics/obisetup5.jpg)
+![obiata](pics/obisetup6.jpg)
+
+**Test calling out before making this final change. Adding your Google Voice number**
+![obigooglevoice](pics/obigv.jpg)
+
+>Make sure to change setting at Google Voice website to have calls going only to your Obi ATA device, not to any other phone or device.
