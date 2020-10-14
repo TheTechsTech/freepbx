@@ -1,6 +1,6 @@
 # FreePBX on Docker
 
-## Image includes
+## Image includes mostly RPM binaries of
 
 * **CentOS** 7.8.2003
 * LAMP stack (**apache2, mariadb, php**)
@@ -12,8 +12,8 @@
 
     `-e SSHPORT="off"` or `-e SSHPORT=xxxx`
 * **Asterisk 16**
-* **FreePBX 15**
-* **AvantFax 3.3.7**
+* **FreePBX 15** - downloaded and complied in from source
+* [AvantFax 3.3.7](http://www.avantfax.com/) - file embedded in this repo, [Hylafax](https://www.hylafax.org/)
 * Using **Postfix** instead of *SendMail*.
 
 ## Running FreePBX
@@ -73,6 +73,10 @@ Add Let's Encrypt SSL certicate to Apache default:
 Change *MariaDB* database root password from default 'CLEARTEXT_PASSWORD':
 
     "Servers -> MySQL Database Server -> Change Administration Password"
+
+Add public IP addresses you will be accessing this FreePBX installation to Fail2ban to prevent lockout/banning:
+
+    "Networking -> Fail2Ban Intrusion Detector -> Filter Action Jails -> Default Jail Options -> IP addresses to never ban"
 
 ## Faxing Setup with Avantfax combining IAXModem/Hylafax
 
