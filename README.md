@@ -190,6 +190,12 @@ Insure you have all items in red **"!"** are changed/edited to match.
 ![obiata](pics/obisetup5.jpg)
 ![obiata](pics/obisetup6.jpg)
 
+**Additional setting need to be set using Obi device built-in webserver**
+![obiata-device](pics/obiata-gv.jpg)
+![obiata-device](pics/obiata.jpg)
+![obiata-device](pics/obiata1.jpg)
+![obiata-device](pics/obiata2.jpg)
+
 **Test calling out before making this final change. Adding your Google Voice number**
 ![obigooglevoice](pics/obigv.jpg)
 
