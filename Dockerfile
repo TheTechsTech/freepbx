@@ -11,7 +11,7 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     && yum -y --enablerepo=epel install sudo icu gcc-c++ lynx tftp-server unixODBC mariadb-devel \
     mariadb-server mariadb mysql-connector-odbc httpd mod_ssl ncurses curl perl fail2ban \
     fail2ban-hostsdeny openssh-server openssh-server-sysvinit sendmail sendmail-cf \
-    sox newt libxml2 libtiff iptables-utils iptables-services initscripts mailx postfix \
+    sox newt libxml2 libtiff iptables-utils iptables-services initscripts postfix mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools bind bind-utils gnutls gnutls-devel perl-devel whois at \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
