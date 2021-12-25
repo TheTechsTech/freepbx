@@ -108,7 +108,7 @@ RUN sed -i 's@ulimit @#ulimit @' /usr/sbin/safe_asterisk \
     && echo "defaultexpire=300" >> /etc/asterisk/iax_registrations_custom.conf \
     && chown asterisk:asterisk /etc/asterisk/iax_registrations_custom.conf \
     && chmod +x /etc/rc.d/init.d/iaxmodem \
-    && yum -y install hylafax* \
+    && yum -y --skip-broken install hylafax* \
     && cd /etc/root \
     && tar -xvzf avantfax-3.3.7.tgz \
     && cd avantfax-3.3.7 \
