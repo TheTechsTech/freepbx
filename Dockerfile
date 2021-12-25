@@ -3,7 +3,7 @@ FROM centos:7.8.2003
 LABEL maintainer="technoexpressnet@gmail.com"
 
 # Install Required Dependencies
-RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
+RUN yum install http://mirror.centos.org/centos/7/os/x86_64/Packages/libical-3.0.3-2.el7.x86_64.rpm -y \
     && yum install http://yum.freepbxdistro.org/pbx/10.13.66/x86_64/RPMS/digium/libresample/0.1.3/libresample-0.1.3-11_centos6.x86_64.rpm -y \
     && yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y \
     && rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm \
@@ -14,7 +14,7 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     sox newt libxml2 libtiff iptables-utils iptables-services initscripts postfix mailx \
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools bind bind-utils gnutls gnutls-devel perl-devel whois at \
-    && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
+    && yum -y install http://mirror.centos.org/centos/7/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
     && yum -y install perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https perl-libwww-perl
 
 # Install Shorewall and the fail2ban action
