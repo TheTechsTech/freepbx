@@ -15,7 +15,7 @@ RUN yum install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/lib
     audiofile gtk2 subversion unzip rsyslog git crontabs cronie cronie-anacron wget vim \
     uuid sqlite net-tools texinfo icu libicu-devel sysvinit-tools bind bind-utils gnutls gnutls-devel perl-devel whois at \
     && yum -y install https://rpmfind.net/linux/centos/7.8.2003/os/x86_64/Packages/perl-URI-1.60-9.el7.noarch.rpm \
-    && yum -y install perl-libwww-perl perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https
+    && yum -y install perl-DBI perl-DBD-MySQL perl-Crypt-SSLeay perl-LWP-Protocol-https perl-libwww-perl
 
 # Install Shorewall and the fail2ban action
 # Install php 5.6 repositories and php5.6w
